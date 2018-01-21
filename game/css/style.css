@@ -1,0 +1,503 @@
+
+
+body {
+
+}
+
+#area {
+    background: white;
+    margin: 0 auto;
+    position: relative;
+}
+
+
+.game-container {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+}
+
+.loaded-game {
+    background: black;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 75%;
+    height: 100%;
+    display: inline-block;
+    user-select: none;
+}
+
+#hold {
+    background: grey;
+    position: absolute;
+    left: 5%;
+    top: 15%;
+    width: 15%;
+    height: 11.25%;
+}
+
+#hold-center {
+    background: black;
+    position: absolute;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+}
+
+#hold-center span, #next-pieces div span {
+    display: table-cell;
+    position: absolute;
+    width: 25%;
+    height: 25%;
+}
+
+#hold-center :not([class]), #next-pieces div :not([class]) {
+    display:none;
+}
+
+#board {
+    background: grey;
+    position: absolute;
+    top: 5%;
+    left: 20%;
+    height: 90%;
+    width: 60%;
+}
+
+#board-cover {
+    position: absolute;
+    background:rgba(255,255,255,0.5);
+    width:100%;
+    height: 100%;
+    outline:none;
+/*    word-wrap: normal;
+    text-align: center;*/
+}
+
+/*#board-cover:focus {
+    background:none;
+}*/
+
+#board-cover:focus > #board-cover-message {
+    display:none;
+}
+
+#next-pieces {
+    background: grey;
+    position: absolute;
+    left: 80%;
+    top: 15%;
+    height: 48.37500%;
+    width: 15%;
+}
+
+#next-piece-0 {
+    margin-bottom:12.5% !important;
+}
+
+#next-pieces div {
+    position: relative;
+    width:80%;
+    height: 18.6046512%;
+    top:2.3255814%;
+    left:10%;
+    background: black;
+}
+
+#misc {
+    background: lightgrey;
+    position: absolute;
+    display: inline-block;
+    right:0px;
+    width: 25%;
+    height: 100%;
+    padding: 5px;
+}
+
+#settings {
+    position: relative;
+    display: block;
+    width: 100%;
+    display: block;
+    word-wrap: break-word;
+}
+
+#title.minor {
+    background: darkgrey;
+    font-size: 20;
+    height: 25;
+}
+
+.settings-button {
+    padding:2px;
+    padding-right: 4px;
+    text-align: right;
+    border-style: none;
+    border-right: 2px solid black;
+    cursor: pointer;
+    user-select: none;
+    background: #afc4c7;
+}
+
+.settings-button-open {
+    padding:2px;
+    padding-right: 4px;
+    text-align: right;
+    cursor: pointer;
+    user-select: none;
+    border: 2px solid black;
+    border-right-style: none;
+}
+
+.settings-button-label {
+    background: #afc4c7;
+}
+
+#selected-settings-button {
+    border-left: 2px solid black;
+    background: darkgreen;
+}
+
+.change-keybind-button {
+    border-right: 2px solid black;
+    border-left: 2px solid black;
+    padding-left:10px;
+    padding-right: 10px;
+    cursor: pointer;
+    background-color: grey;
+}
+
+.closed-setting {
+    display:none;
+}
+
+.open-setting {
+    display: block;
+    background: darkgrey;
+    text-align: center;
+}
+
+span {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    display: table-cell;
+    float: left;
+    border: 1px solid hsl(300, 2%, 10%);
+    background-color:hsl(300, 100%, 0%);
+    width: 10%;
+    height: 5%;
+}
+
+div .i {
+    background: hsl(196, 89%, 57%);
+    border: 1px solid hsl(191, 100%, 64%);
+}
+div .j {
+    background: hsl(231, 69%, 45%);
+    border: 1px solid hsl(222, 65%, 50%);
+}
+div .l {
+    background: hsl(24, 98%, 44%);
+    border: 1px solid hsl(27, 91%, 52%);
+}
+div .o {
+    background: hsl(42, 97%, 45%);
+    border: 1px solid hsl(41, 92%, 58%);
+}
+div .s {
+    background: hsl(92, 91%, 37%);
+    border: 1px solid hsl(90, 76%, 46%);
+}
+div .t {
+    background: hsl(314, 63%, 41%);
+    border: 1px solid hsl(310, 60%, 48%);
+}
+div .z {
+    background: hsl(348, 86%, 45%);
+    border: 1px solid hsl(350, 98%, 61%);
+}
+div .grey {
+    background: hsl(0, 0%, 78%);
+    border:1px solid hsl(270, 1%, 38%);
+}
+div .shadow {
+    background: hsl(300, 1%, 17%);
+    border:1px solid hsl(270, 1%, 38%);
+}
+
+.tetresse-options {
+    width: 60%;
+    height: 3%;
+    top: 2%;
+    left: 20%;
+    position: absolute;
+    background: #ffffff4a;
+}
+
+.tetresse-option {
+    background: #c4c4c4;
+    position: relative;
+    width: 8%;
+    height: 90%;
+    cursor: pointer;
+    display: block;
+    float: right;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    margin-right:.5%;
+    margin-left:.5%;
+    border-radius: 0px 0px 3px 3px;
+
+}
+
+.tetresse-save {
+    content:url(../imgs/download.svg);
+}
+
+.tetresse-setting {
+    content:url(../imgs/settings.svg);
+}
+
+.tetresse-load {
+    content:url(../imgs/upload.svg);
+}
+
+.tetresse-stats {
+    content:url(../imgs/stats.svg);   
+}
+
+.tetresse-menu {
+    position: absolute;
+    width: 90%;
+    height: 95%;
+    margin: 5%;
+    background-color: lightgrey;
+    /*display:none;*/
+    font-size: .75vw;
+    white-space: normal;
+}
+
+.tetresse-menu-title {
+    position: relative;
+    background: #e4e4e4;
+    padding: 1% 0% 1% 0%;
+    text-align: center;
+    width: 100%;
+    overflow: auto;
+    font-size: .884vw;
+}
+
+.tetresse-menu-title-text {
+    display:inline-block;
+}
+
+.tetresse-menu-title-button {
+    margin:.25% 1% 0% 1%;
+    padding: .25% .5% .25% .5%;
+}
+
+.tetresse-menu-title-button:hover {
+    background:lightblue;
+    cursor: pointer;
+}
+
+.tetresse-question {
+    content: url(../imgs/question.svg);
+}
+
+.tetresse-question {
+
+}
+
+.tetresse-view {
+    content: url(../imgs/view.svg);
+}
+
+.tetresse-add {
+    content: url(../imgs/add.svg);
+}
+
+.tetresse-edit {
+    position:relative;
+
+    content: url(../imgs/edit.svg);
+    width: 6%;
+}
+
+.tetresse-arrow-sideways {
+    content: url(../imgs/arrow.png);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-0deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+    margin-top:.5%;
+}
+
+.tetresse-arrow-down {
+    content: url(../imgs/arrow.png);
+    margin-top: 1%;
+
+}
+
+.tetresse-dots {
+    content: url(../imgs/dots.png);
+}
+
+.tetresse-x {
+    content: url(../imgs/x.svg);
+    position: relative;
+    width: 6%;
+}
+
+.tetresse-hamburger {
+    position: relative;
+    width: 6%;
+    content: url(../imgs/hamburger.png);
+}
+
+.tetresse-al {
+    float: left;
+}
+
+.tetresse-ar {
+    float: right;
+}
+
+.tetresse-menu-break {
+    text-align: center;
+    margin: 3% 0% 1% 0%;
+    border: 1px solid black;
+    border-right: 0px;
+    border-left: 0px;
+    position:relative;
+}
+
+.tetresse-menu-group {
+    position: relative;
+    overflow: auto;
+    width: 86%;
+    left: 7%;
+}
+
+.tetresse-menu-keybinds-button {
+    display: inline;
+    width: 11%;
+    padding: 1% 1.5% 1% 1.5%;
+    position: relative;
+    margin-top: 1%;
+    border-radius: 20%; 
+    margin-left:1%;
+    margin-right:2%;
+}
+
+.tetresse-menu-keybinds-button:hover {
+    background: lightblue;
+    cursor: pointer;
+}
+
+.tetresse-menu-keybinds-button:focus {
+    outline: none;
+}
+
+.tetresse-menu-keybinds-element {
+    position: relative;
+    display:inline-block;
+    width:47%;
+    text-align: center;
+    background: #c5c5c5;
+    border: 1px solid black;
+    border-top:none;
+    border-bottom: none;
+    margin-bottom: 1%;
+}
+
+.tetresse-menu-keybinds-text {
+    display:inline;
+}
+
+.tetresse-menu-stat {
+    margin-top: 1%;
+    width: 86%;
+    left: 7%;
+    position: relative;
+    border: 0px solid transparent;
+    display:inline-block;
+    background: #c5c5c5;
+    padding-right: 1%;
+}
+
+.tetresse-menu-stat-button {
+    display: inline;
+    height: 2%;
+    margin: .7% 0% .5% 0%;
+    padding: .5% 1.5% .5% 1.5%;
+    position: relative;
+    border-radius: 20%; 
+    margin-left:1%;
+    margin-right:2%;
+}
+
+.tetresse-menu-stat-button:hover {
+    background: lightblue;
+    cursor: pointer;
+}
+
+.tetresse-menu-stat-arrow {
+    display: inline;
+    width: 6%;
+    position: relative;
+    border-radius: 20%;
+    margin-left:1%;
+    margin-right:2%;
+}
+
+.tetresse-menu-stat .tetresse-menu-stat {
+    display:none;
+    width: 93%;
+    padding-right: 0px;
+    margin-bottom: 0px;
+}
+
+.tetresse-menu-stat-number {
+    background:#d3d3d3;
+    position:relative;
+    padding: .1% 3% .1% 3%;
+    top: -.1%;
+}
+
+.tetresse-disabled {
+    display:none;
+}
+
+.tetresse-menu-keybinds-checkbox {
+    margin: 1% 0% 0% 0%;
+    height: 2.7%;
+    width: 15%;
+}
+
+.tetresse-menu-keybinds-edit-area {
+    display: none;
+    position: relative;
+    width: 50%;
+    height: 3%;
+    margin: 0px;
+    resize: none;
+    overflow: hidden;
+    padding: 0;
+    font-size: .7vw;
+    text-align: right;
+}
+
+.tetresse-menu-content {
+    position:relative;
+    display:block;
+    height: 95%;
+    overflow-y:auto;
+    width: 100%;
+}

@@ -1,0 +1,123 @@
+body {
+    font-family: "Verdana";
+    background: hsla(188, 86%, 83%, 0.86);
+    margin: 0px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#page-area-container {
+    background: #7cd5e2;
+    margin: 0px auto;
+    width: 60%;
+    height: 100%;
+    position: relative;
+}
+
+#page-area {
+    position: relative;
+    width: 100%;
+}
+
+#play-area {
+    width: 60%;
+    left: 15%;
+    position: relative;
+}
+
+.title {
+    padding-bottom: 6.5%;
+    height:0px;
+    background: lightgrey;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 40px;
+    font-size: 3.5vw;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+#stats {
+    position: absolute;
+    background: lightblue;
+    top: 15%;
+    left: 65%;
+    width: 30%;
+    padding: 1%;
+    white-space: nowrap;
+    font-size: 1vw;
+    border-spacing: 0px;
+}
+
+td {
+    padding: 0px;
+}
+
+th {
+    padding: 0px;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
+
+select {
+    border: 0px;
+    background: #c4c4c4;
+    box-shadow: none;
+    font: inherit;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+#stats-selection, #stats-selection option{
+    width: 100%;
+}
+
+#stats-selection:focus, #keybinds-selection:focus {
+    outline: none;
+}
+
+#keybinds-selection {
+    width: 54%;
+}
+
+#keybinds-area {
+    font-size: 1.5vw;
+    position: absolute;
+    width: 41%;
+    background: lightblue;
+    left: 15%;
+    top: 105%;
+    padding: 2%;
+}
+
+#keybinds-entry {
+    position: absolute;
+    display: none;
+    left: 57%;
+    top: 30%;
+    width: 13%;
+    height: 41%;
+    background: #e3aeae;
+    text-align: center;
+}
+
+#keybinds-submit {
+    font: inherit;
+    display: none;
+    position: absolute;
+    height: 41%;
+    width: 23%;
+    top: 30%;
+    left: 73%;
+    background: #c4c4c4;
+    border: none;
+    padding: 0%;
+}
+
+#keybinds-submit:focus, #keybinds-entry:focus {
+    outline: none;
+}
