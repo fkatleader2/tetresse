@@ -271,6 +271,10 @@ div .shadow {
     content:url(../imgs/stats.svg);   
 }
 
+.tetresse-refresh {
+    content:url(../imgs/refresh.svg);   
+}
+
 .tetresse-menu {
     position: absolute;
     width: 90%;

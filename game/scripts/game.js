@@ -37,7 +37,9 @@ function setup() {
 
     for (var i = 0; i < gameArr.length; i++) {
         var element = gameArr[i];
-        var settings = {};
+
+        var settings = getCookie("settings");
+        settings = settings.length == 0 ? {} : JSON.parse(settings);
 
         if (element.innerHTML.length != 0) {
             var str = element.innerHTML;
@@ -65,9 +67,37 @@ function setup() {
         ele1 = addChild(element, "game-" + games.length, "div");
         ele1.classList.add("loaded-game");
 
+        settings.playable = true; // jank!
+
         var a = new Game([ele1, settings]); // idk why but if I remove the variable a this doesn't work :'(
         games.push(a);
     }
+}
+
+function setCookie(name, value, exp) {
+    value = escape(value);
+    var d = new Date();
+    d.setTime(d.getTime() + (exp*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    name += "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            var rtnstr = c.substring(name.length, c.length);
+            return unescape(rtnstr);
+        }
+    }
+    console.log("Couldn't get cookie");
+    return "";
 }
 
 // TODO add these as static functions to game class
@@ -120,6 +150,7 @@ class Game {
                     settings[labels[i]] = changedSettings[labels[i]];
             }
         }
+        setCookie("settings", JSON.stringify(this.settings), 1000);
 
         // generate board
         this.board = {
@@ -145,6 +176,10 @@ class Game {
                 }
             }
         }
+
+        // add credits
+        var tempCredits = addChild(this.boardCover.parentNode.parentNode, "credits", "div");
+        tempCredits.innerHTML = "<!-- Images: Icons made by Dave Gandy, Freepik,  from www.flaticon.com -->";
 
         // add rest of elements
         var holdContainer = addChild(this.element, "hold", "div")
@@ -332,7 +367,7 @@ class Game {
             v = addChild(keybinds, keybinds.id + "-heading", "div");
             v.classList.add(this.name + "-menu-break");
             v.innerHTML = "Keybinds";
-            arr = ["Left", "Right", "CCW", "CW", "SD", "HD", "Hold"];
+            arr = ["Left", "Right", "CCW", "CW", "SD", "HD", "Hold", "180"];
             for (var i = 0; i < arr.length; i++) {
                 var g, e;
                 if (i % 2 == 0) {
@@ -421,8 +456,10 @@ class Game {
                     var val = parseInt(eles[3].value);
                     if (eles[4].id.indexOf("-arr") != -1) {
                         board.settings.arr = val
+                        setCookie("settings", JSON.stringify(board.settings), 1000);
                     } else {
                         board.settings.das = val;
+                        setCookie("settings", JSON.stringify(board.settings), 1000);
                     }
                     eles[4].innerHTML = val;
                     eles[4].style.display = "inline-block";
@@ -462,10 +499,13 @@ class Game {
                 v.checked = this.settings[arr[i][0]];
                 addEvent(v, "change", function(e) {
                     var board = games[Game.getGameNumber(e.target.id)];
-                    if (e.target.id.indexOf("-show-") != -1)
+                    if (e.target.id.indexOf("-show-") != -1) {
                         board.settings.showFinesseErrors = e.target.checked;
-                    else
+                        setCookie("settings", JSON.stringify(board.settings), 1000);
+                    } else {
                         board.settings.redoFinesseErrors = e.target.checked;
+                        setCookie("settings", JSON.stringify(board.settings), 1000); // TODO remove these inline cookie updates
+                    }
                 });
             }
 
@@ -696,6 +736,11 @@ class Game {
             v.onclick = function(e) {
                 games[Game.getGameNumber(e.target.id)].showMenu("question");
             };
+            v = addChild(options, options.id + "-refresh", "div");
+            v.classList.add(this.name + "-refresh", this.name + "-ar", this.name + "-option");
+            v.onclick = function(e) {
+                games[Game.getGameNumber(e.target.id)].resetGame();
+            };   
             v = addChild(options, options.id + "-settings", "div");
             v.classList.add(this.name + "-setting", this.name + "-ar", this.name + "-option");
             v.onclick = function(e) {
@@ -718,7 +763,7 @@ class Game {
             v.classList.add(this.name + "-stats", this.name + "-ar", this.name + "-option");
             v.onclick = function(e) {
                 games[Game.getGameNumber(e.target.id)].showMenu("stats");
-            };
+            };         
         }
 
         // set listener for file upload
@@ -895,6 +940,9 @@ class Game {
                 } else if (b.settings.keyCodes[e.keyCode] == "ccw") {
                     b.piece.addKeyPressed("ccw");
                     b.addMove(function() {b.piece.rotate(-1)});
+                } else if (b.settings.keyCodes[e.keyCode] == "180") {
+                    b.piece.addKeyPressed("180");
+                    b.addMove(function() {b.piece.rotate(1);b.piece.rotate(1)});
                 } else if (b.settings.keyCodes[e.keyCode] == "hd") {
                     b.piece.addKeyPressed("hd");
                     while(b.piece.canDrop()) {
@@ -1059,6 +1107,7 @@ class Game {
             // while(this.listeners.length != 0) {
             //     document.removeEventListener("keydown", this.listeners.splice(0,1)[0]);
             // }
+            
             this.gameOver = false;
             this.resetGame();
             this.playPiece();
@@ -1081,6 +1130,7 @@ class Game {
                 }
             }
         }
+        this.stats.reset();
     }
 
     /**
@@ -1496,6 +1546,7 @@ class Game {
             redoFinesseErrors: true,
             addKeyCode: function(key, number) {
                 this.keyCodes[number] = key;
+                setCookie("settings", JSON.stringify(this), 1000);
             },
 
             labels: [
@@ -2152,7 +2203,7 @@ class Piece {
         var arr = this.getShadowElements();
         for (var i = 0; i < arr.length; i++) {
             var e = this.board.board.tiles[arr[i][0]][arr[i][1]].element;
-            if (e.classList.length != 0) {
+            if (e != null && e.classList.length != 0) {
                 e.classList.remove("shadow");
             }
         }
