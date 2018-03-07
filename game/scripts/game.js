@@ -265,8 +265,12 @@ class Game {
             var count = 0;
             for (var i = p.keysPressed.length - 1; i >= 0; i--) {
                 var j = p.keysPressed[i].key;
-                if ("hold sd".indexOf(j) != -1)
+                if ("hold".indexOf(j) != -1)
                     break;
+                if ("sd".indexOf(j) != -1) {
+                    count = 0;
+                    break;
+                }
                 if (("hd").indexOf(j) == -1)
                     count++;
             }
