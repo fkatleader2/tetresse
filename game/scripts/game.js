@@ -27,7 +27,7 @@ var games;
  */
 
 /**
- * setup - goes through page and replaces elements that contain class "game" with a game 
+ * setup - goes through page and replaces elements that contain class "game" with a game
  */
 function setup() {
     games = [];
@@ -265,9 +265,9 @@ class Game {
             var count = 0;
             for (var i = p.keysPressed.length - 1; i >= 0; i--) {
                 var j = p.keysPressed[i].key;
-                if (j.indexOf("hold") != -1)
+                if ("hold sd".indexOf(j) != -1)
                     break;
-                if (("sd hd").indexOf(j) == -1)
+                if (("hd").indexOf(j) == -1)
                     count++;
             }
 
@@ -381,7 +381,7 @@ class Game {
                 v.classList.add(this.name + "-question");
                 v.classList.add(this.name + "-menu-keybinds-button");
                 v.classList.add(this.name + "-al");
-                v.title = (i == 0 || i == 1 ? "Move " + arr[i].toLowerCase() + "... have you not played tetris before? You should probably learn what the controls do before learning finesse" : 
+                v.title = (i == 0 || i == 1 ? "Move " + arr[i].toLowerCase() + "... have you not played tetris before? You should probably learn what the controls do before learning finesse" :
                         (i == 2 || i == 3 ? "Rotate " + (i == 2 ? "counter " : "") + "clockwise" :
                             (i == 4 ? "Soft drop (drop softly)" : (i == 5 ? "Hard drop (http://harddrop.com/fkatleader2/)" :
                                 (i == 6 ? "Hold the current piece in play" : "")
@@ -603,7 +603,7 @@ class Game {
                             e4.classList.add(board.name + "-disabled");
                         }
                         for (var j = 0; j < reference.pageStat.linked.length; j++)
-                            h(e2, board, reference.pageStat.linked[j]);                        
+                            h(e2, board, reference.pageStat.linked[j]);
                     }
                 }
                 if (reference.stats == null)
@@ -619,7 +619,7 @@ class Game {
                         stats: [
                             {id: "time-paused", name: "Paused", pageStat: this.stats.totalPauseTime},
                         ]
-                    }, {id: "pieces-placed", name: "Pieces Placed", pageStat: this.stats.piecesPlaced, 
+                    }, {id: "pieces-placed", name: "Pieces Placed", pageStat: this.stats.piecesPlaced,
                         // stats: [
                         //     {} TODO add the different pieces
                         // ]
@@ -706,7 +706,7 @@ class Game {
             v.classList.add(this.name + "-menu-break");
             v.innerHTML = "Known Bugs";
             v = addChild(questionKnownBugs, questionKnownBugs.id + "-text", "div");
-            v.innerHTML = "-Finesse tracker:<br>Ignores a piece if it's spun into place.<br>Soft dropping a piece under an overhang does not count correctly.<br>Does not penalize using DAS left instead of right right (not using DAS is faster).<br>-o spin:<br>Not yet implemented.";
+            v.innerHTML = "-Finesse tracker:<br>Ignores a piece if it's spun into place.<br>Counter stops counting after soft drops.<br>Does not penalize using DAS left instead of right right (not using DAS is faster).<br>-o spin:<br>Not yet implemented.";
             // bug reporting TODO
             var questionBugs = addChild(question, question.id + "-bugs", "div");
             questionBugs.classList.add(this.name + "-menu-group");
@@ -722,7 +722,7 @@ class Game {
             v.classList.add(this.name + "-menu-break");
             v.innerHTML = "Future Plans";
             v = addChild(questionFuture, questionFuture.id + "-text", "div");
-            v.innerHTML = 'I plan on developing this clone with the intent of helping players learn different aspects of the game and towards making it easy for others to create and share tutorials that teach a specific area. <br>Any ideas / insights / comments are welcome. Just shoot an email to<br><div style="display:inline;user-select:text;">tf.tetresse@gmail.com</div><br><br><div style="text-align:right;">-tf2</div>';
+            v.innerHTML = 'I plan on developing this clone with the intent of helping players learn different aspects of the game and towards making it easy for others to create and share tutorials that teach a specific area. <br>Any ideas / insights / comments are welcome. Just shoot an email to<br><div style="display:inline;user-select:text;">tf.tetresse@gmail.com</div><br><br>Updated Mar. 7, 2018<div style="display:inline-block;float:right;text-align:right;">-tf2</div>';
         }
 
         // options bar
@@ -740,7 +740,7 @@ class Game {
             v.classList.add(this.name + "-refresh", this.name + "-ar", this.name + "-option");
             v.onclick = function(e) {
                 games[Game.getGameNumber(e.target.id)].resetGame();
-            };   
+            };
             v = addChild(options, options.id + "-settings", "div");
             v.classList.add(this.name + "-setting", this.name + "-ar", this.name + "-option");
             v.onclick = function(e) {
@@ -763,7 +763,7 @@ class Game {
             v.classList.add(this.name + "-stats", this.name + "-ar", this.name + "-option");
             v.onclick = function(e) {
                 games[Game.getGameNumber(e.target.id)].showMenu("stats");
-            };         
+            };
         }
 
         // set listener for file upload
@@ -833,7 +833,7 @@ class Game {
             settingsEle.style.display = "block";
         } else if (menuString == "question") {
             title.innerHTML = "Help";
-            document.getElementById(gameID + "-menu-question").style.display = "block";            
+            document.getElementById(gameID + "-menu-question").style.display = "block";
         } else {
             this.showMenu(null);
         }
@@ -1130,6 +1130,16 @@ class Game {
                 }
             }
         }
+        
+        this.bag = [];
+        this.piece = null;
+        this.heldPiece = null;
+        this.updateHeld();
+        this.swapped = false;
+        this.resetGravityTimer();
+        this.bag = [];
+        this.nextPieces = [];
+        this.updateNextPieces();
         this.stats.reset();
     }
 
@@ -1166,7 +1176,7 @@ class Game {
                     loc += 1
                 rot = 0;
             }
-        } 
+        }
         if ("jlt".indexOf(piece) != -1) {
             piece = "j";
             if (rot == 1)
@@ -1289,13 +1299,16 @@ class Game {
     }
 
     updateNextPieces() {
-        for (var j = 0; j < this.nextPieces.length; j++) {
+        for (var j = 0; j < this.settings.nextPiecesNum; j++) {
             for (var i = 0; i < 4; i++) {
                 var p = this.realNextPiecesLocations[j][i];
+                var u = this.nextPieces[j] == null ? "" : this.nextPieces[j].piece;
                 if (p.classList.length == 0)
-                    p.classList.add(this.nextPieces[j].piece);
+                    p.classList.add(u);
                 else
-                    p.classList.value = this.nextPieces[j].piece;
+                    p.classList.value = u;
+                if (u == "")
+                    continue;
                 p.style.top = (this.heldLocations[this.nextPieces[j].piece][i][0]) + "%";
                 p.style.left = (this.heldLocations[this.nextPieces[j].piece][i][1]) + "%";
             }
@@ -1303,8 +1316,14 @@ class Game {
     }
 
     updateHeld() {
-        if (this.heldPiece == null)
+        if (this.heldPiece == null) {
+            for (var i = 0; i < this.realHeldPieces.length; i++) {
+                var p = this.realHeldPieces[i];
+                if (p.classList.length != 0)
+                    p.classList.value = "";
+            }
             return;
+        }
             
         for (var i = 0; i < this.realHeldPieces.length; i++) {
             var p = this.realHeldPieces[i];
@@ -1513,9 +1532,9 @@ class Game {
     // returns object with all settings: use .label to get a list of labels of the settings
     static getDefaultSettings() {
         var settings = {
-            das: 125, // 
+            das: 125, //
             arr: Math.floor(1000/60),
-            gravityDelay: 1000, 
+            gravityDelay: 1000,
             maxMoves: 20,
             softDropSpeed: 25,
             displayedBoardHeight: 20,
@@ -1575,7 +1594,7 @@ class Game {
 /**
  * class Stats:
  * Possible listeners:
- *   pause - 
+ *   pause -
  *   resume
  *   startGame
  *   endGame
@@ -1624,7 +1643,7 @@ class Stats {
             // log("[executeStatsListeners] could not execute event (index was null): " + event + "\n statsListener was:\n" + this.statsListeners);
             return;
         }
-        for (var i = 0; i < funcs.length; i++) 
+        for (var i = 0; i < funcs.length; i++)
             funcs[i](this);
     }
 
@@ -1641,7 +1660,7 @@ class Stats {
     /**
      * addStatsListener: adds a stats listener
      * event - is a string
-     * func - is a function 
+     * func - is a function
      */
     addStatsListener(event, func) {
         if (this.statsListeners[event] == null)
@@ -1844,7 +1863,7 @@ class PageStat {
             } else if (this.type == "t") {
                 var s = ((this.value % 60000) / 1000).toFixed(1);
                 var m = Math.floor((this.value / 60000) % 60);
-                var h = Math.floor((this.value / 3600000)); 
+                var h = Math.floor((this.value / 3600000));
                 v = (h == 0 ? "" : h + ":") + (m == 0 ? "" : m + ":") + s;
             } else {
                 error("Type not recognized: " + this.type);
@@ -1892,7 +1911,7 @@ class Clock {
         this.func = func;
 
         this.completed = false;
-        this.creationTime = new Date().getTime();        
+        this.creationTime = new Date().getTime();
 
         this.storedTime = -1;
         this.pausedTime = -1;
@@ -1940,8 +1959,8 @@ class Clock {
     // return number of intervals that have passed
     getStoredTime() {
         if (this.paused)
-            return this.storedTime;    
-        else 
+            return this.storedTime;
+        else
             return this.storedTime + new Date().getTime() - this.startTime;
     }
 
@@ -1979,10 +1998,13 @@ class GravityTimer {
         this.start = new Date().getTime();
         
         var f = function(board) {
-            board.gravNum--;
+            if (board.gravNum == 0)
+                return;
+            if (board.gravNum >= 1)
+                board.gravNum--;
             if (board.gravNum != 0)
                 return;
-
+            
             board.piece.drop();
             
             if (board.gravTimer != null)
