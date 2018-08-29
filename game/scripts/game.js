@@ -635,7 +635,7 @@ class Game {
                         stats: [
                             {id: "singles", name: "Singles", pageStat: this.stats.linesCleared.count[0]},
                             {id: "doubles", name: "Doubles", pageStat: this.stats.linesCleared.count[1]},
-                            {id: "tripples", name: "Tripples", pageStat: this.stats.linesCleared.count[2]},
+                            {id: "triples", name: "Triples", pageStat: this.stats.linesCleared.count[2]},
                             {id: "tetrisses", name: "Tetrisses", pageStat: this.stats.linesCleared.count[3]}
                         ]
                     }, {id: "spins", name: "Spins", pageStat: this.stats.spins.total,
@@ -644,38 +644,38 @@ class Game {
                                 stats: [
                                     {id: "singles", name: "Singles", pageStat: this.stats.spins.i.count[0]},
                                     {id: "doubles", name: "Doubles", pageStat: this.stats.spins.i.count[1]},
-                                    {id: "tripples", name: "Tripples", pageStat: this.stats.spins.i.count[2]},
+                                    {id: "triples", name: "Triples", pageStat: this.stats.spins.i.count[2]},
                                     {id: "tetrisses", name: "Tetrisses", pageStat: this.stats.spins.i.count[3]}
                                 ]
                             }, {id: "j", name: "J", pageStat: this.stats.spins.j.total,
                                 stats: [
                                     {id: "singles", name: "Singles", pageStat: this.stats.spins.j.count[0]},
                                     {id: "doubles", name: "Doubles", pageStat: this.stats.spins.j.count[1]},
-                                    {id: "tripples", name: "Tripples", pageStat: this.stats.spins.j.count[2]}
+                                    {id: "triples", name: "Triples", pageStat: this.stats.spins.j.count[2]}
                                 ]
                             }, {id: "l", name: "L", pageStat: this.stats.spins.l.total,
                                 stats: [
                                     {id: "singles", name: "Singles", pageStat: this.stats.spins.l.count[0]},
                                     {id: "doubles", name: "Doubles", pageStat: this.stats.spins.l.count[1]},
-                                    {id: "tripples", name: "Tripples", pageStat: this.stats.spins.l.count[2]}
+                                    {id: "triples", name: "Triples", pageStat: this.stats.spins.l.count[2]}
                                 ]
                             }, {id: "s", name: "S", pageStat: this.stats.spins.s.total,
                                 stats: [
                                     {id: "singles", name: "Singles", pageStat: this.stats.spins.s.count[0]},
                                     {id: "doubles", name: "Doubles", pageStat: this.stats.spins.s.count[1]},
-                                    {id: "tripples", name: "Tripples", pageStat: this.stats.spins.s.count[2]}
+                                    {id: "triples", name: "Triples", pageStat: this.stats.spins.s.count[2]}
                                 ]
                             }, {id: "t", name: "T", pageStat: this.stats.spins.t.total,
                                 stats: [
                                     {id: "singles", name: "Singles", pageStat: this.stats.spins.t.count[0]},
                                     {id: "doubles", name: "Doubles", pageStat: this.stats.spins.t.count[1]},
-                                    {id: "tripples", name: "Tripples", pageStat: this.stats.spins.t.count[2]}
+                                    {id: "triples", name: "Triples", pageStat: this.stats.spins.t.count[2]}
                                 ]
                             }, {id: "z", name: "Z", pageStat: this.stats.spins.z.total,
                                 stats: [
                                     {id: "singles", name: "Singles", pageStat: this.stats.spins.z.count[0]},
                                     {id: "doubles", name: "Doubles", pageStat: this.stats.spins.z.count[1]},
-                                    {id: "tripples", name: "Tripples", pageStat: this.stats.spins.z.count[2]}
+                                    {id: "triples", name: "Triples", pageStat: this.stats.spins.z.count[2]}
                                 ]
                             }
                         ]
@@ -1616,10 +1616,10 @@ class Game {
  *   end-time
  *   pieces-placed
  *   finesse-errors (-[ps, pp])
- *   lines-cleared (-[singles, doubles, tripples, tetrisses]) (-[ps, pp])
+ *   lines-cleared (-[singles, doubles, triples, tetrisses]) (-[ps, pp])
  *   spins (-[ps, pp])
  *     [i, j, l, s, t, z]-spins (-[ps, pp])
- *     [i, j, l, s, t, z]-spin-[singles, doubles, tripples[, tetrisses]] (-[ps, pp]) eg: i-spin-tetrisses, t-spin-tripples-ps
+ *     [i, j, l, s, t, z]-spin-[singles, doubles, triples[, tetrisses]] (-[ps, pp]) eg: i-spin-tetrisses, t-spin-triples-ps
  */
 class Stats {
     constructor(board) {
@@ -1699,35 +1699,35 @@ class Stats {
         this.finessePrintout = new PageStat(["finesse-errors-p", this, "-"]);
         this.linesCleared = {
             total: "lines-cleared",
-            count: ["singles","doubles","tripples","tetrisses"]
+            count: ["singles","doubles","triples","tetrisses"]
         };
         // total spins is the number of pieces spun not lines cleared
-        // count is the number of singles / doubles / tripples
+        // count is the number of singles / doubles / triples
         this.spins = {
             total: "spins",
             i: {
                 total: "i-spins",
-                count: ["i-spin-singles","i-spin-doubles","i-spin-tripples","i-spin-tetrisses"]
+                count: ["i-spin-singles","i-spin-doubles","i-spin-triples","i-spin-tetrisses"]
             },
             j: {
                 total: "j-spins",
-                count: ["j-spin-singles","j-spin-doubles","j-spin-tripples"]
+                count: ["j-spin-singles","j-spin-doubles","j-spin-triples"]
             },
             l: {
                 total: "l-spins",
-                count: ["l-spin-singles","l-spin-doubles","l-spin-tripples"]
+                count: ["l-spin-singles","l-spin-doubles","l-spin-triples"]
             },
             s: {
                 total: "s-spins",
-                count: ["s-spin-singles","s-spin-doubles","s-spin-tripples"]
+                count: ["s-spin-singles","s-spin-doubles","s-spin-triples"]
             },
             t: {
                 total: "t-spins",
-                count: ["t-spin-singles","t-spin-doubles","t-spin-tripples"]
+                count: ["t-spin-singles","t-spin-doubles","t-spin-triples"]
             },
             z: {
                 total: "z-spins",
-                count: ["z-spin-singles","z-spin-doubles","z-spin-tripples"]
+                count: ["z-spin-singles","z-spin-doubles","z-spin-triples"]
             }
         };
 
