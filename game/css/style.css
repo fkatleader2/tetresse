@@ -230,8 +230,8 @@ div .shadow {
 
 .tetresse-options {
     width: 60%;
-    height: 3%;
-    top: 2%;
+    height: 4%;
+    top: 1%;
     left: 20%;
     position: absolute;
     background: #ffffff4a;
@@ -240,8 +240,8 @@ div .shadow {
 .tetresse-option {
     background: #c4c4c4;
     position: relative;
-    width: 8%;
-    height: 90%;
+    width: 10%;
+    height: 85%;
     cursor: pointer;
     display: block;
     float: right;
@@ -256,23 +256,38 @@ div .shadow {
 }
 
 .tetresse-save {
-    content:url(../imgs/download.svg);
+    background-image:url(../imgs/download.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-setting {
-    content:url(../imgs/settings.svg);
+    background-image:url(../imgs/settings.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-load {
-    content:url(../imgs/upload.svg);
+    background-image:url(../imgs/upload.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-stats {
-    content:url(../imgs/stats.svg);   
+    background-image:url(../imgs/stats.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-refresh {
-    content:url(../imgs/refresh.svg);   
+    background-image:url(../imgs/refresh.svg);   
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-menu {
@@ -311,7 +326,10 @@ div .shadow {
 }
 
 .tetresse-question {
-    content: url(../imgs/question.svg);
+    background-image: url(../imgs/question.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-question {
@@ -319,22 +337,34 @@ div .shadow {
 }
 
 .tetresse-view {
-    content: url(../imgs/view.svg);
+    background-image: url(../imgs/view.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-add {
-    content: url(../imgs/add.svg);
+    background-image: url(../imgs/add.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-edit {
     position:relative;
 
-    content: url(../imgs/edit.svg);
+    background-image: url(../imgs/edit.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     width: 6%;
 }
 
 .tetresse-arrow-sideways {
-    content: url(../imgs/arrow.png);
+    background-image: url(../imgs/arrow.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     -webkit-transform: rotate(-90deg);
     -moz-transform: rotate(-0deg);
     -o-transform: rotate(-90deg);
@@ -344,25 +374,39 @@ div .shadow {
 }
 
 .tetresse-arrow-down {
-    content: url(../imgs/arrow.png);
+    background-image: url(../imgs/arrow.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     margin-top: 1%;
 
 }
 
 .tetresse-dots {
-    content: url(../imgs/dots.png);
+    background-image: url(../imgs/dots.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .tetresse-x {
-    content: url(../imgs/x.svg);
+    background-image: url(../imgs/x.svg);
     position: relative;
     width: 6%;
+    height: 3.3%;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .tetresse-hamburger {
     position: relative;
     width: 6%;
-    content: url(../imgs/hamburger.png);
+    background-image: url(../imgs/hamburger.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 3%;
 }
 
 .tetresse-al {
@@ -391,13 +435,14 @@ div .shadow {
 
 .tetresse-menu-keybinds-button {
     display: inline;
-    width: 11%;
+    width: 9%;
     padding: 1% 1.5% 1% 1.5%;
     position: relative;
     margin-top: 1%;
     border-radius: 20%; 
     margin-left:1%;
     margin-right:2%;
+    height: 2.1%;
 }
 
 .tetresse-menu-keybinds-button:hover {
@@ -445,6 +490,7 @@ div .shadow {
     border-radius: 20%; 
     margin-left:1%;
     margin-right:2%;
+    width: 3%;
 }
 
 .tetresse-menu-stat-button:hover {
@@ -459,6 +505,7 @@ div .shadow {
     border-radius: 20%;
     margin-left:1%;
     margin-right:2%;
+    height: 2%;
 }
 
 .tetresse-menu-stat .tetresse-menu-stat {
