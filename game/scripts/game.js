@@ -726,7 +726,7 @@ class Game {
             v.classList.add(this.name + "-menu-break");
             v.innerHTML = "Future Plans";
             v = addChild(questionFuture, questionFuture.id + "-text", "div");
-            v.innerHTML = 'I plan on developing this clone with the intent of helping players learn different aspects of the game and towards making it easy for others to create and share tutorials that teach a specific area. <br>Any ideas / insights / comments are welcome. Just shoot an email to<br><div style="display:inline;user-select:text;">tf.tetresse@gmail.com</div><br><br>Updated Mar. 7, 2018<div style="display:inline-block;float:right;text-align:right;">-tf2</div>';
+            v.innerHTML = 'I am currently developing a new multiplayer tetris game which will be announced on the harddrop discord winter or spring 2019. Eventually I am planning on porting this tool over to that site and will make tetresse.harddrop.com forward to the new site.<br>Any ideas / insights / comments are welcome. Just shoot an email to<br><div style="display:inline;user-select:text;">tf.tetresse@gmail.com</div><br><br>Updated Aug. 29, 2018<div style="display:inline-block;float:right;text-align:right;">-tf2</div>';
         }
 
         // options bar
