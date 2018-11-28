@@ -57,9 +57,9 @@ Life cycle of a game (and "module games"): create, start, pause, resume, reset, 
 
 The following methods are also called for every module where all requirements are met. Note function params are the same (`myModule.setup()`) except for create: `myModule.create(game)`
 
-[**setup()**](#details-setup) Sets up core. Order of module setup is not guarenteed.
+[**setup()**](#detailsSetup) Sets up core. Order of module setup is not guarenteed.
 
-**[cleanup()](#details-cleanup)** Cleans up memory and html listeners used by core.
+**[cleanup()](#detailsCleanup)** Cleans up memory and html listeners used by core.
 
 **game create(settings)** Creates a new game structure `{board, piece, upNext, hold, modules, listeners}`.
 
