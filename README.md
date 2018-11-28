@@ -88,10 +88,10 @@ The following data and methods are unique to the core.
 <a href="details"></a>
 ## Implementation Details
 
-<a href="details-setup"></a>
+<a href="detailsSetup"></a>
 **setup()**
 
-<a href="details-cleanup"></a>
+<a href="detailsCleanup"></a>
 **cleanup()** Cleans up memory and html listeners used by core.
 
 <a href="details-create"></a>
