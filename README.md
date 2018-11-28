@@ -30,7 +30,7 @@ How to help / development stuff
 
 **modules/game.js** "Master" module which specifies where and when to make tetresse instances. Also implements html interaction with specific functions (change settings, start, reset, pause, etc).
 
-<a href="module"></a>
+<a name="module"></a>
 ## Module Implementation
 To add module to list of tetresse modules, use: `tetresse.modules.myModule = {}`
 
@@ -50,7 +50,7 @@ tetresse.modules.myModule = {
 }
 ```
 Note that resume is not defined. "keywords" are only called / parsed if they are defined, so leaving some out is fine.
-<a href="src"></a>
+<a name="src"></a>
 ## Source Code Structure
 Life cycle of core (and modules): setup, destroy
 Life cycle of a game (and "module games"): create, start, pause, resume, reset, start, destroy
@@ -85,49 +85,49 @@ The following data and methods are unique to the core.
 
 **execute(event) execute(listeners, event)** Executes event by calling all events specified in listeners by priority (lightest first: 0 to 100).
 
-<a href="details"></a>
+<a name="details"></a>
 ## Implementation Details
 
-<a href="detailsSetup"></a>
+<a name="details-setup"></a>
 **setup()**
 
-<a href="detailsCleanup"></a>
+<a name="details-cleanup"></a>
 **cleanup()** Cleans up memory and html listeners used by core.
 
-<a href="details-create"></a>
+<a name="details-create"></a>
 **game create(settings)** Creates a new game structure `{board, piece, upNext, hold, modules, listeners}`.
 
-<a href="details-destroy"></a>
+<a name="details-destroy"></a>
 **destroy(game)** Called on game event "destroy". Destroys (cleans up) a game, including memory and listeners.
 
-<a href="details-start"></a>
+<a name="details-start"></a>
 **start(game)** Called on game event "start" (note: either create or reset must be called prior to this). Starts the game from a blank state.
 
-<a href="details-reset"></a>
+<a name="details-reset"></a>
 **reset(game)** Called on game event "reset". Resets a game to it's blank state.
 
-<a href="details-pause"></a>
+<a name="details-pause"></a>
 **pause(game)** Called on game event "pause" (note: start or resume must be called prior to this). Pauses the game but preserves the state.
 
-<a href="details-resume"></a>
+<a name="details-resume"></a>
 **resume(game)** Called on game event "resume" (note: pause must have been called prior to this). Resumes the game at its paused state.
 
-<a href="details-games"></a>
+<a name="details-games"></a>
 **games** Structure with games listed in format `{id: 3, list: [0, 2], game0, game2}` (note that game1 has been destroyed)
 
-<a href="details-utils"></a>
+<a name="details-utils"></a>
 **utils** Object with useful methods `{game: {move(), rotate(), drop(), place(), isValid(), ...}, defaultSettings, ...}`
 
-<a href="details-listeners"></a>
+<a name="details-listeners"></a>
 **listeners** Structure storing events and callbacks for core.
 
-<a href="details-listen"></a>
+<a name="details-listen"></a>
 **listen(event, priority, func, data) listen(listeners, event, priority, func, data)** Listens for event.
 
-<a href="details-execute"></a>
+<a name="details-execute"></a>
 **execute(event) execute(listeners, event)** Executes event by calling all events specified in listeners by priority (lightest first: 0 to 100).
 
-<a href="license"></a>
+<a name="license"></a>
 ## License
 Copyright (c) 2018 tetresse
 
