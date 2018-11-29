@@ -171,8 +171,8 @@ Default piece life:
 [gamestart]
 > next -> initCur -> (move)\
 > place -> next -> initCur
->> hold  
->> if first time: next -> initCur
+>> hold
+>> if first time: next -> initCur\
     else initCur
 [gameend]
 
