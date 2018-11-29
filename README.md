@@ -85,8 +85,6 @@ The following data and methods are unique to the core.
 
 [**execute(event) execute(listeners, event)**](#details-execute) Executes event by calling all events specified in listeners by priority (lightest first: 0 to 100).
 
-[**q**](#details-queue) Object which takes multiple threads and makes execution synchronous.
-
 <a name="details"></a>
 ## Implementation Details
 
@@ -168,6 +166,7 @@ games = {
 
 Mechanics linked when game is created unless setting specified (TODO).
 Default piece life:
+```
 [gamestart]
 next -> initCur -> (move)\
     place -> next -> initCur
@@ -175,6 +174,20 @@ next -> initCur -> (move)\
         if first time: next -> initCur\
         else initCur
 [gameend]
+```
+
+####Game:
+**hold(game)**
+
+**move(game, amount)**
+
+####Misc:
+**test1**
+
+* **test2**
+* **test3**
+- **test4**
+- **test5**
 
 Overview:
 ```
@@ -226,9 +239,6 @@ utils = {
 
 <a name="details-execute"></a>
 **execute(event) execute(listeners, event)**
-
-<a name="details-queue"></a>
-**q**
 
 <a name="license"></a>
 ## License
