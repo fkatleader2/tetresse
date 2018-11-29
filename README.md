@@ -169,9 +169,9 @@ games = {
 Mechanics linked when game is created unless setting specified (TODO).
 Default piece life:
 [gamestart]
-> next -> initCur -> (move)
+> next -> initCur -> (move)\
 > place -> next -> initCur
->> hold
+>> hold  
 >> if first time: next -> initCur
     else initCur
 [gameend]
