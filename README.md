@@ -17,8 +17,9 @@ Super quick start: clone repo, open index.html, done!
 How to help / development stuff
 <a name="files"></a>
 ## File Structure:
-
-**tetresse.js** Core game mechanics and module setup.
+<dl>
+    <dt>**tetresse.js**</dt><dd>Core game mechanics and module setup.<dd>
+</dl>
 
 **index.html** Regular html file - a module is required to display board.
 
@@ -37,7 +38,7 @@ To add module to list of tetresse modules, use: `tetresse.modules.myModule = {}`
 "Keywords" used by the core in your module: setup(), cleanup(), create(game), destroy(game), start(game), reset(game), pause(game), resume(game), requires
 
 Example module:
-```
+```javascript
 tetresse.modules.myModule = {
     requires: { modules: ["graphics, controls"] },
     setup() { this.data = {} },
@@ -75,15 +76,15 @@ The following methods are also called for every module where all requirements ar
 
 The following data and methods are unique to the core.
 
-[**games**](#details-games) Structure with games listed in format `{id: 3, list: [0, 2], game0, game2}` (note that game1 has been destroyed)
-
-[**utils**](#details-utils) Object with useful methods `{game: {move(), rotate(), drop(), place(), isValid(), ...}, defaultSettings, ...}`
-
 [**listeners**](#details-listeners) Structure storing events and callbacks for core.
 
 [**on(event, priority, func, data) on(listeners, event, priority, func, data)**](#details-listen) Listens for event.
 
 [**execute(event) execute(listeners, event)**](#details-execute) Executes event by calling all events specified in listeners by priority (lightest first: 0 to 100).
+
+[**games**](#details-games) Structure with games listed in format `{id: 3, list: [0, 2], game0, game2}` (note that game1 has been destroyed)
+
+[**utils**](#details-utils) Object with useful methods `{game: {move(), rotate(), drop(), place(), isValid(), ...}, defaultSettings, ...}`
 
 <a name="details"></a>
 ## Implementation Details
@@ -102,7 +103,7 @@ Note: order is not guarenteed.
 **game create(settings)** Creates a game with given settings and calls all module's create function (`myModule.create(obj)`) if it's a function and passes: `{game, settings}`.
 
 Settings parameter format:
-```
+```javascript
 settings = {
     rows, cols, // numbers (width and height of board)
     m: {
@@ -112,7 +113,7 @@ settings = {
 ```
 
 Game object returned:
-```
+```javascript
 game = {
     id, // number
     modules: {},
@@ -149,7 +150,7 @@ game = {
 <a name="details-games"></a>
 **games** Object containing games created.
 
-```
+```javascript
 games = {
     remove(id), // removes id and game at id
     cleanup(), // resets games (emptys and resets ids)
@@ -166,6 +167,7 @@ games = {
 
 Mechanics linked when game is created unless setting specified (TODO).
 Default piece life:
+
 ```
 [gamestart]
 next -> initCur -> (move)\
@@ -176,21 +178,19 @@ next -> initCur -> (move)\
 [gameend]
 ```
 
-####Game:
+#### Game:
 **hold(game)**
 
 **move(game, amount)**
 
-####Misc:
+#### Misc:
 **test1**
 
-* **test2**
-* **test3**
 - **test4**
 - **test5**
 
 Overview:
-```
+```javascript
 utils = {
     game: { // module calls move(game, 1) if(testMove(game, 1) == 1) place(game)
         hold(game) // returns boolean
