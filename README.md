@@ -18,9 +18,10 @@ How to help / development stuff
 <a name="files"></a>
 ## File Structure:
 <dl>
-    **<dt>tetresse.js</dt>**<dd>Core game mechanics and module setup.</dd>
-
-    <dt>index.html<dt><dd>Regular html file - a module is required to display board.</dd>
+    <dt>tetresse.js</dt>
+    <dd>Core game mechanics and module setup.</dd>
+    <dt>index.html<dt>
+    <dd>Regular html file - a module is required to display board.</dd>
 </dl>
 
 **modules/** Modules go here. Note all modules listed are not required for the core.
