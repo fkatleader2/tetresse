@@ -20,17 +20,17 @@ How to help / development stuff
 <dl>
     <dt>tetresse.js</dt>
     <dd>Core game mechanics and module setup.</dd>
-    <dt>index.html<dt>
+    <dt>index.html</dt>
     <dd>Regular html file - a module is required to display board.</dd>
+    <dd>modules/</dd>
+    <dt>Modules go here. Note all modules listed are not required for the core.</dt>
+    <dd>modules/graphics.js</dd>
+    <dt>Generates a canvas and syncs the core with the canvas.</dt>
+    <dd>modules/controls.js</dd>
+    <dt>Binds key events to core controls.</dt>
+    <dd>modules/game.js</dd>
+    <dt>"Master" module which specifies where and when to make tetresse instances. Also implements html interaction with specific functions (change settings, start, reset, pause, etc).</dt>
 </dl>
-
-**modules/** Modules go here. Note all modules listed are not required for the core.
-
-**modules/graphics.js** Generates a canvas and syncs the core with the canvas.
-
-**modules/controls.js** Binds key events to core controls.
-
-**modules/game.js** "Master" module which specifies where and when to make tetresse instances. Also implements html interaction with specific functions (change settings, start, reset, pause, etc).
 
 <a name="module"></a>
 ## Module Implementation
@@ -59,9 +59,12 @@ Life cycle of a game (and "module games"): create, start, pause, resume, reset, 
 
 The following methods are also called for every module where all requirements are met. Note function params are the same (`myModule.setup()`) except for create: `myModule.create(game)`
 
-[**setup()**](#details-setup) Sets up core. Order of module setup is not guarenteed.
-
-[**cleanup()**](#details-cleanup) Cleans up memory and html listeners used by core.
+<dl>
+    <dd>[setup()](#details-setup)</dd>
+    <dt>Sets up core. Order of module setup is not guarenteed.</dt>
+    [<dd>**cleanup()**</dd>](#details-cleanup)
+    <dt>Cleans up memory and html listeners used by core.</dt>
+</dl>
 
 [**game create(settings)**](#details-create) Creates a new game structure `{board, piece, upNext, hold, modules, listeners}`.
 
