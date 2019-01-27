@@ -8,6 +8,7 @@ This project provides a standardized way to add features to the core game. It no
 - [Module Implementation](#module)
 - [Source Code Structure](#src)
 - [Implementation Details](#details)
+- [Default Module Documentation](#modules)
 - [License](#license)
 <a name="quickstart"></a>
 ## Quickstart:
@@ -57,7 +58,7 @@ Note that resume is not defined. "keywords" are only called / parsed if they are
 Life cycle of core (and modules): setup, destroy
 Life cycle of a game (and "module games"): create, start, pause, resume, reset, start, destroy
 
-The following methods are also called for every module where all requirements are met. Note function params are the same (`myModule.setup()`) except for create: `myModule.create(game)`
+The following methods are also called for every module where all requirements are met. Note function params are the same (`myModule.reset(game)`) except for create: `myModule.create(game, settings)`
 
 [**setup()**](#details-setup) Sets up core. Order of module setup is not guarenteed.
 
@@ -79,7 +80,7 @@ The following data and methods are unique to the core.
 
 [**listeners**](#details-listeners) Structure storing events and callbacks for core.
 
-[**on(event, priority, func, data) on(listeners, event, priority, func, data)**](#details-listen) Listens for event.
+[**on((game,) event, (priority,) func, (data))**](#details-listen) Listens for event.
 
 [**execute(event) execute(listeners, event)**](#details-execute) Executes event by calling all events specified in listeners by priority (lightest first: 0 to 100).
 
@@ -91,7 +92,7 @@ The following data and methods are unique to the core.
 ## Implementation Details
 
 <a name="details-setup"></a>
-**setup()** Goes through all modules, warns if some module's requirements (`myModule.requires = {modules: []}`) are not met and removes them. Calls remaining module's setup function (`myModule.setup()`) if it's a function.
+**setup()** Goes through all modules, warns if some module's requirements (`myModule.requires = {modules: []}`) are not met and removes them. Calls remaining module's setup function (`myModule.setup()`) if it's a function. Executes tetreses.listener "setup" after setting up all modules.
 
 Note: order is not guarenteed.
 
@@ -108,7 +109,7 @@ Settings parameter format:
 settings = {
     rows, cols, // numbers (width and height of board)
     m: {
-        myModule: {} // settings for myModule
+        myModule: {}, // settings for myModule
     }
 }
 ```
@@ -117,7 +118,7 @@ Game object returned:
 ```javascript
 game = {
     id, // number
-    modules: {},
+    modules: {}, // data for myModule for specific games can be stored at game.modules.myModule
     listeners: { id: 0 },
     board: [rows][cols],
     cur: {
@@ -212,7 +213,7 @@ utils = {
         testOverlap(game, (locX), (locY), (layout)) // tests if piece is overlapping any on the board, returns true if overlapping
         place(game) // places cur onto board
         next(game) // next piece becomes cur
-        initCur(game) // initializes cur piece
+        initCur(game) // calls next if piece is null then initializes cur piece
         testFilledRows(game) // searches from bottom until it reaches an empty row, returns array of numbers (rows that are filled)
         collapse(game) // collapses completed board rows
     },
@@ -236,10 +237,35 @@ utils = {
 **listeners**
 
 <a name="details-on"></a>
-**on(event, priority, func, data) on(listeners, event, priority, func, data)**
+**on((game,) event, (priority,) func, (data))** Adds function and data to execute on event. Core priority (mechanics) is 50, graphics are 80, default is 70.
 
 <a name="details-execute"></a>
 **execute(event) execute(listeners, event)**
+
+<a name="modules"></a>
+## Default Modules Documentation
+[defaultGraphics](#modules-defaultgraphics)
+[defaultControls](#modules-defaultcontrols)
+
+<a name="modules-defaultgraphics"></a>
+## defaultGraphics
+#### Game settings:
+<dl>
+    <dt>id</dt>
+    <dd>Specifies specific tetresse tag in which to generate this game's graphics. Eg inside `<tetresse id="tetresse-game4"></tetresse>`. By convention, start the id with tetresse-[your id]. Note: all elements created will be destroyed on `tetresse.cleanup()`. Default is the first tetresse tag that isn't being used by a different game.</dd>
+    <dt>type</dt>
+    <dd>What type of graphics to use. Options are "div", "percent", "pixel", "text", or "table". "div" will only use html tags to show the board (every tile is a span or div). "precent" and "pixel" both use a canvas, however percent uses exact percentages to determine size while "pixel" draws the largest board it can using only complete pixels. This results in "percent" having blury lines for low resolutions and "pixel" not quite filling the area provided. "text" and "table" show the actual string values of the board. Default is "div".</dd>
+</dl>
+
+Example:
+```javascript
+settings.m.defaultGraphics {
+    id: "tetresse-game4", type: "pixel",
+}
+```
+
+<a name="modules-defaultcontrols"></a>
+## defaultControls
 
 <a name="license"></a>
 ## License

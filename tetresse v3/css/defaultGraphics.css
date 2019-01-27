@@ -1,0 +1,13 @@
+body {
+    background: #e2f8ff;
+}
+
+tetresse {
+    display: inline-block;
+    width: 1000px;
+    height: 1000px;
+}
+
+canvas.tetresse-pixel {
+    position: absolute;
+}
