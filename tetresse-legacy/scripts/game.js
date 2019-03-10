@@ -262,31 +262,39 @@ class Game {
             var rec = s.board.record;
             var p = s.board.piece;
 
-            var count = 0;
+            var weightedCount = 0.0;
             for (var i = p.keysPressed.length - 1; i >= 0; i--) {
                 var j = p.keysPressed[i].key;
                 if ("hold".indexOf(j) != -1)
                     break;
                 if ("sd".indexOf(j) != -1) {
-                    count = 0;
+                    weightedCount = 0.0;
                     break;
                 }
                 if (("hd").indexOf(j) == -1)
-                    count++;
+                    weightedCount += 1.0;
+                if (!!p.keysPressed[i].repeated)
+                    weightedCount += 0.5;
             }
 
             if (!p.spin) {
                 var v = s.board.getIdealFinesse(p.piece, p.getLocation()[1], p.getRotation(), p.spin);
-                
+                var optimalWeight = 0.0;
+
                 var str = "";
-                for (var i = 0; i < v.length; i++)
+                for (var i = 0; i < v.length; i++) {
                     str += v[i] + ", ";
+                    optimalWeight += 1.0;
+                    if (v[i].indexOf("das") != -1) {
+                        optimalWeight += 0.5;
+                    }
+                }
                 if (str.length > 0)
                     str = str.substring(0, str.length - 2);
                 else
                     str = "drop"; // TODO put this in settings?
-                if (count - v.length > 0) {
-                    s.finesse.add(count - v.length);
+                if (weightedCount - optimalWeight > 0) {
+                    s.finesse.add(weightedCount - optimalWeight);
                     s.finessePrintout.updateValue(str); // TODO add finesse error (tell user what they did that was wrong)
                     if (s.board.settings.redoFinesseErrors)
                         p.reset();
@@ -710,7 +718,7 @@ class Game {
             v.classList.add(this.name + "-menu-break");
             v.innerHTML = "Known Bugs";
             v = addChild(questionKnownBugs, questionKnownBugs.id + "-text", "div");
-            v.innerHTML = "-Finesse tracker:<br>Ignores a piece if it's spun into place.<br>Counter stops counting after soft drops.<br>Does not penalize using DAS left instead of right right (not using DAS is faster).<br>-o spin:<br>Not yet implemented.";
+            v.innerHTML = "-Finesse tracker:<br>Ignores a piece if it's spun into place.<br>Counter stops counting after soft drops.<br>-o spin:<br>Not yet implemented.";
             // bug reporting TODO
             var questionBugs = addChild(question, question.id + "-bugs", "div");
             questionBugs.classList.add(this.name + "-menu-group");
@@ -905,10 +913,11 @@ class Game {
                 if (b.settings.keyCodes[e.keyCode] == "right") {
                     if (b.boolKeys.right.down)
                         return;
-                    b.piece.addKeyPressed("right");
+                    var o = b.piece.addKeyPressed("right");
                     b.boolKeys.right.down = true;
                     b.boolKeys.left.down = false;
-                    var m = function() {
+                    var m = function(first = false) {
+                        if (!first) o.repeated = true;
                         if (b.boolKeys.left.down) {
                             b.boolKeys.right.down = false;
                             return;
@@ -916,17 +925,18 @@ class Game {
                         if (b.piece.canMove(1))
                             b.addMove(function() {b.piece.move(1)});
                     };
-                    m();
+                    m(true);
                     if (b.pieceMoveTimeout["right"] != null)
                         clearTimeout(b.pieceMoveTimeout["right"]);
                     b.pieceMoveTimeout["right"] = setTimeout(Game.repeatKeys, b.settings.das, m, b.boolKeys.right, b.settings.arr);
                 } else if (b.settings.keyCodes[e.keyCode] == "left") {
                     if (b.boolKeys.left.down)
                         return;
-                    b.piece.addKeyPressed("left");
+                    var o = b.piece.addKeyPressed("left");
                     b.boolKeys.left.down = true;
                     b.boolKeys.right.down = false;
-                    var m = function() {
+                    var m = function(first = false) {
+                        if (!first) o.repeated = true;
                         if (b.boolKeys.right.down) {
                             b.boolKeys.left.down = false;
                             return;
@@ -934,7 +944,7 @@ class Game {
                         if (b.piece.canMove(-1))
                             b.addMove(function() {b.piece.move(-1)});
                     };
-                    m();
+                    m(true);
                     if (b.pieceMoveTimeout["left"] != null)
                         clearTimeout(b.pieceMoveTimeout["left"]);
                     b.pieceMoveTimeout["left"] = setTimeout(Game.repeatKeys, b.settings.das, m, b.boolKeys.left, b.settings.arr);
@@ -1156,6 +1166,13 @@ class Game {
      * spin - boolean of whether this piece spun
      */
     getIdealFinesse(piece, loc, rot, spin) {
+        var has180 = false;
+        for (let x in this.settings.keyCodes) {
+            if (this.settings.keyCodes.hasOwnProperty(x) && this.settings.keyCodes[x] === "180") {
+                has180 = true;
+                break;
+            }
+        }
         if (piece == "i") {
             if (rot == 1) {
                 loc += + 2;
@@ -1237,7 +1254,16 @@ class Game {
                     ["das right", "left", "cw"],
                     ["das right", "cw"]
                 ], // 1
-                [
+                has180 ? [
+                    ["das left", "180"],
+                    ["left", "left", "180"],
+                    ["left", "180"],
+                    ["180"],
+                    ["right", "180"],
+                    ["right", "right", "180"],
+                    ["das right", "left", "180"],
+                    ["das right", "180"]
+                ] : [
                     ["das left", "cw", "cw"],
                     ["left", "left", "cw", "cw"],
                     ["left", "cw", "cw"],
@@ -2097,7 +2123,8 @@ class Piece {
     }
 
     addKeyPressed(m) {
-        this.keysPressed.push({key: m, time: new Date().getTime()});
+        this.keysPressed.push({key: m, time: new Date().getTime(), repeated: false});
+        return this.keysPressed[this.keysPressed.length - 1];
     }
 
     reset() {
