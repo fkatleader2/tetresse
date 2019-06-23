@@ -1,772 +1,447 @@
-tetresse.modules.graphics = {
+'use strict';
+var tetresse;
+tetresse.modules.defaultGraphics = {
+    layouts: {
+        board: {row: {weight: 50, label: "board", n: 42}, col: {weight: 50, label: "board", n: 21}},
+        hold: {row: "board", col: {weight: 30, label: "hold", n: 5.5}},
+        next: {row: "board", col: {weight: 70, label: "next", n: 6}},
+        incoming: {row: "board", col: {weight: 60, label: "incoming", n: 1}},
+        abilities: {row: "board", col: "hold"},
+        mana: {row: "board", col: {weight: 40, label: "mana", n: 1}},
+    },
+    sources: {
+        imgs: {}, // added in sources.imgs[pathToImage] = {loaded: false, ele: element}
+        i: "#30bff3", // color, img, keyframes: [{t, x, y, w, h, r, tr, c, img}], generate, (data), (imgs), (src), (srcAfter)
+        j: "#243bc2",
+        l: "#de5a02",
+        o: "#e29f03",
+        s: "#59b408",
+        t: "#aa278c",
+        z: "#d51038",
+        g: "#808080",
+        blank: "#000000",
+        border: "#808080",
+        incoming: "#ff0000",
+        mana: "#4b26a5",
+        background: "black"
+    },
     setup() {
-        for (var v in tetresse.modules)
-            if (v != "graphics" && tetresse.modules[v].graphics != null && tetresse.modules[v].graphics.sources != null)
-                for (var lbl in tetresse.modules[v].graphics.sources) {
-                    this.sources[lbl] = {};
-                    for (var label in tetresse.modules[v].graphics.sources[lbl]) {
-                        var objRef = label.split(".")
-                        objRef = objRef[objRef.length - 1];
-                        var obj = tetresse.get(label, lbl, this.sources, true)[objRef] = tetresse.modules[v].graphics.sources[lbl][label];
-                    }
-                }
-
-        var loadSources = function(func, obj, depth, path = "") {
-            if (depth == 0 || obj == null) return;
-            // console.log("called1: " + depth);
-            // console.log("called2: " + depth);
-            if (obj.animate != null) { // fill in missing keyframe data
-                var ani = obj.animate;
-                var defaultKeys = {transparency: 1, translationX: 0, translationY: 0, rotation: 0, scaleX: 1, scaleY: 1, source: null};
-                if (ani.keyFrames != null) {
-                    var startKeys = {};
-                    var endKeys = {};
-                    ani.keyFrames.forEach(function(ele) {
-                        for (var v in ele)
-                            startKeys[v] = startKeys[v] === undefined ? ele[v] : startKeys[v];
-                        endKeys[v] = ele[v];
-                    });
-                    var prevValue = null;
-                    if (ani.keyFrames[0].time > 0) ani.keyFrames.splice(0, 0, {time: 0});
-                    for (var lbl in defaultKeys) {
-                        var ele;
-                        for (var i = 0; (ele = ani.keyFrames[i]) !== undefined; i++) {
-                            if (ele.time == null) { tetresse.utils.error("time for one of the animations was null"); return; }
-                            if (i == 0) { ele[lbl] = ele[lbl] === undefined ? (startKeys[lbl] === undefined ? defaultKeys[lbl] : startKeys[lbl]) : ele[lbl]; }
-                            else { // average with prevValue
-                                if (ele[lbl] === undefined) { // find next value and average
-                                    var next = {v: undefined, t: 0};
-                                    for (var j = i + 1; j < ani.keyFrames.length; j++) {
-                                        next.v = ani.keyFrames[j][lbl];
-                                        next.t = ani.keyFrames[j].time;
-                                        if (next.v !== undefined) break;
-                                    }
-                                    if (next.v === undefined) { // no next value, fills in rest of this label
-                                        for (var j = i; j < ani.keyFrames.length; j++) {
-                                            ele = ani.keyFrames[j];
-                                            ele[lbl] = endKeys[lbl] === undefined ? defaultKeys[lbl] : endKeys[lbl];
-                                        }
-                                        break;
-                                    } else if (typeof prevValue == "number" && typeof next.v == "number") { // average numbers
-                                        var prevTime = ani.keyFrames[i - 1];
-                                        var nextEle;
-                                        for (i = i; (nextEle = ani.keyFrames[i])[lbl] === undefined; j++)
-                                            nextEle[lbl] = ((nextEle.time - prevTime) / (next.t - prevTime)) * (next.v - prevValue) + prevValue;
-                                    } else { // set value the same as previous keyframe
-                                        ele[lbl] = prevValue;
-                                    }
-                                }
-                            }
-                            prevValue = ele[lbl];
-                        }
-                    }
-                } else {
-                    ani.keyFrames = [defaultKeys];
-                }
-            }
-            if (obj.src != null) { // imgs
-                tetresse.modules.graphics.loadImage(obj.src);
-                return;
-            }
-            depth--;
-            for (var v in obj) {
-                if (v == "imgs") continue;
-                func(func, obj[v], depth, path + (path == "" ? "" : "-") + v);
-            }
-        };
-        loadSources(loadSources, this.sources, 4);
+        // import css
+        var cssId = "tetresseModule-defaultGraphics";
+        if (!document.getElementById(cssId)) {
+            var head = document.getElementsByTagName("head")[0];
+            var link = document.createElement("link");
+            link.id = cssId;
+            link.rel = "stylesheet";
+            link.type = "text/css";
+            link.href = "css/defaultGraphics.css";
+            link.media = "all";
+            head.appendChild(link);
+        }
+        // load sources (load images, fill out keyframes)
     },
-    grid: {
-        create(arr) {
-            var grid = {
-                rowLabels: {}, // {board: 12}, board ele is in 12th index of rows array
-                colLabels: {},
-                rows: [], // {label, weight, n} sorted array of components
-                cols: [],
-                rowsChange: false,
-                colsChange: false,
-                rowsTotal: 0,
-                colsTotal: 0,
-            };
-            if (arr != null)
-                arr.forEach(function(ele) {
-                    this.add(ele);
-                });
-            this.generateLocs(grid);
-            return grid;
-        },
+    cleanup() {
+        var ele; var data = tetresse.modules.defaultGraphics.data;
+        for (ele of data.generatedElements) ele.parentElement.removeChild(ele);
+        for (ele of data.disabledElements) ele.parent.appendChild(ele.ele);
+    },
+    create(game, settings) { // initialize game.modules.defaultGraphics and call specific create (eg utils.pixel)
+        var ele, type = "text";
+        var initClass = "tetresse-defaultGraphics-init";
+        // get element to use
+        try {
+            settings.m.defaultGraphics = settings.m.defaultGraphics === undefined ? {} : settings.m.defaultGraphics;
+            type = settings.m.defaultGraphics.type === undefined ? type : settings.m.defaultGraphics.type;
+            if (typeof(type) !== "string") { console.warn("[defaultGraphics] Invalid type %s should be string for 'settings.m.defaultGraphics.type'. Changing type to 'text'", typeof(type)); type = "text"; }
+            var id = settings.m.defaultGraphics.id;
+            if (typeof(id) === "undefined") throw "[defaultGraphics] id undefined";
+            if (typeof(id) !== "string") { console.error("[defaultGraphics] Invalid type %s should be string for settings.m.defaultGraphics.id"); return; }
+            ele = document.getElementById(id);
+            if (ele === null) { console.error("[defaultGraphics] Element with id (%s) could not be found.", id); return; }
+            if (ele.classList.contains(initClass)) {
+                console.error("[defaultGraphics] Element specified by settings.m.defaultGraphics.id (%s) is already in use. Call tetresse.destroy(game) before calling create on the id again.", id); return;
+            }
+        } catch (e) {
+            ele = undefined;
+            for (var tmpEle of document.getElementsByTagName("tetresse"))
+                if (!tmpEle.classList.contains(initClass)) { ele = tmpEle; break; }
+        }
+        if (typeof("ele") === "undefined") { console.error("[defaultGraphics] No free tetresse tag to create game in. To fix, either tetresse.destroy(game) some games or create more <tetresse></tetresse> in the HTML."); return; }
+        ele.classList.add("tetresse-defaultGraphics-init");
+        ele.style["font-family"] = "monospace";
+        game.modules.defaultGraphics = {element: ele};
+        ele.innerHTML = "";
+
+        var utils = tetresse.modules.defaultGraphics.utils;
+        if (type === "text") utils.text.setup(game);
+        else if (type === "textRaw") utils.text.setup(game, true);
+        else if (type === "pixel") utils.pixel.create(game, settings);
+        else if (type === "percent") utils.percent.setup(game, settings);
+        else console.warn("[defaultGraphics] Unrecognized type '%s'", type);
+    },
+    reset(game) {},
+    destroy(game) {
+        game.modules.defaultGraphics.element.classList.remove("tetresse-defaultGraphics-init");
+    },
+    pause(game) {},
+    resume(game) {},
+    utils: {
         /**
-         * ele: {row: {label: "hi", weight: 50, n: 10}, col: "hi"} creates new row / puts in column labeled hi
+         * data: what to draw where (mutated)
+         * (src): sourcesKey - gets the obj specified at defaultGraphics.sources[sourcesKey]
          */
-        add(grid, ele) {
-            if (ele == null) { tetresse.utils.error("ele cannot be null (grid.add)"); return; }
-            ["row", "col"].forEach(function(rc) {
-                if (typeof ele[rc] != "string") { // trying to add to row / col
-                    if (grid[rc + "Labels"][ele[rc].label] != null) { tetresse.utils.error("label [" + ele[rc].label + "] already exists in " + rc + "s"); return; }
-                    if (ele[rc].label != null && (ele[rc].weight == null || ele[rc].n == null)) return;
-                    if (ele[rc].weight == null || ele[rc].n == null || ele[rc].label == null) {tetresse.utils.error("element needs valid weight (" + ele[rc].weight + "), label (" + ele[rc].label + "), and n (" + ele[rc].n + ") in " + rc); return; }
-                    var loc = tetresse.utils.getLocToInsert(grid[rc + "s"], "weight", ele[rc]);
-                    grid[rc + "s"].splice(loc, 0, ele[rc]);
-                    grid[rc + "sChange"] = true;
-                }
-            });
-        },
-        generateLocs(grid) {
-            ["row", "col"].forEach(function(rc) {
-                if (!grid[rc + "sChange"]) return;
-                var amount = 0;
-                var i = 0;
-                grid[rc + "s"].forEach(function(ele) {
-                    grid[rc + "Labels"][ele.label] = i;
-                    ele.nOffset = amount;
-                    amount += ele.n;
-                    i++;
-                });
-                grid[rc + "sTotal"] = amount;
-            });
-        },
-        edit(grid, ele, newEle) {
-            
-        },
-        get(grid, ele) { // returns x and y offset as well as w and h
-            if (grid == null) { tetresse.utils.error("grid cannot be null"); return; }
-            this.generateLocs(grid);
-            var row = typeof ele.row == "string" ? ele.row : ele.row.label;
-            var col = typeof ele.col == "string" ? ele.col : ele.col.label;
-            col = grid.cols[grid.colLabels[col]];
-            row = grid.rows[grid.rowLabels[row]];
-            return {x: col.nOffset, y: row.nOffset, w: col.n, h: row.n};
-        },
-        getTotals(grid) { // returns {w, h} of totals
-            if (grid == null) { tetresse.utils.error("grid cannot be null"); return; }
-            this.generateLocs(grid);
-            return {w: grid.colsTotal, h: grid.rowsTotal};
-        }
-    },
-    sources: { // TODO preload src images
-        imgs: {},
-        default: {
-            tiles: {
-                all: {},
-                i: {color: "hsl(196, 89%, 57%)"},
-                j: {color: "hsl(231, 69%, 45%)"},
-                l: {color: "hsl(24, 98%, 44%)"},
-                o: {color: "hsl(42, 97%, 45%)"},
-                s: {color: "hsl(92, 91%, 37%)"},
-                t: {color: "hsl(314, 63%, 41%)"},
-                z: {color: "hsl(348, 86%, 45%)"},
-                g: {color: "grey"},
-                p: {color: "#525252c0",
-                    generate(game, canvas, source, loc) { // loc: {x, y, w, h}, source: background
-                        if (game == null) { tetresse.utils.error("game cannot be null"); return; }
-                        var graphics = game.modules.graphics;
-                        var ctx = canvas.getContext("2d");
-                        if (loc.w - 6 <= 0 || loc.h - 6 <= 0) return;
-                        ctx.beginPath();
-                        ctx.clearRect(loc.x + 3, loc.y + (loc.w == loc.h ? 3 : 0), loc.w - 6, loc.h - (loc.w == loc.h ? 6 : 3));
-                        ctx.rect(loc.x + 3, loc.y + (loc.w == loc.h ? 3 : 0), loc.w - 6, loc.h - (loc.w == loc.h ? 6 : 3));
-                        ctx.fillStyle = source.color;
-                        ctx.fill();
-                    }
-                },
-                lineclear: {
-                    animate: {
-                        keyFrames: [
-                            {time: 0, transparency: 0, source: {color: "rgba(255, 255, 255)"}},
-                            // {time: 100, transparency: 1},
-                            // {time: 199, transparency: 1},
-                            // {time: 200, transparency: 0},
-                            {time: 490, transparency: 1, source: {color: "#000000"}},
-                            {time: 500}
-                        ]
-                    }
-                },
-                "": {color: "clear",
-                    generate(game, canvas, source, loc) { // loc: {x, y, w, h}, source: background
-                        var graphics = game.modules.graphics;
-                        var ctx = canvas.getContext("2d");
+        draw(game, canvas, sData, src) {
+            sData = sData === null || sData === undefined ? {} : sData; var data = {}; var v;
+            for (v in sData) data[v] = sData[v];
+            var defaults = {x: 0, y: 0, w: 100, h: 100, t: 0, r: 0, transparency: 1, type: "rect", animate: false, n: 2}; // type: rect or circle, requires color specified
+            var utils = tetresse.modules.defaultGraphics.utils;
+            var sources = tetresse.modules.defaultGraphics.sources;
+            if (typeof(src) === "string") src = sources[src];
+            if (src === undefined) return;
+            if (typeof(src) === "string" && defaults.color === undefined) defaults.color = src;
+            for (v in defaults) if (data[v] === undefined) data[v] = defaults[v];
+            var srcCopyArr = ["color"]; for (v of srcCopyArr) if (data[v] === undefined) data[v] = src[v];
 
-                        if (loc.w - 4 <= 0 || loc.h - 4 <= 0) return;
-                        ctx.beginPath();
-                        ctx.rect(loc.x + 2, loc.y + (loc.w == loc.h ? 2 : 0), loc.w - 4, loc.h - (loc.w == loc.h ? 4 : 2));
-                        ctx.fillStyle = "#ffffff30";
-                        ctx.fill();
-                        if (loc.w - 6 <= 0 || loc.h - 6 <= 0) return;
-                        ctx.clearRect(loc.x + 3, loc.y + (loc.w == loc.h ? 3 : 0), loc.w - 6, loc.h - (loc.w == loc.h ? 6 : 3));
-                    }
-                },
-            },
-            incomming: {color: "red"},
-            mana: {color: "#4b26a5"},
-            border: {color: "grey"},
-            clear: {color: "clear"},
-            background: {color: "black"}, // src: "imgs/space.jpg"
-            lineclear: { // TODO animate entire row
-            },
-        }
-    },
-    getSource(game, label) { // returns source specified by game in this order: game.modules.graphics.sources[label], game.mode, default
-        var override = game.modules.graphics.sources[label];
-        return tetresse.get(label, override == null ? game : override, this.sources);
-    },
-    loadImage(src, callback, args = null) { // loads source and calls callback(args, img) where img is the img created, returns true if loading
-        var imgs = tetresse.modules.graphics.sources.imgs;
-        if (imgs[src] == null) {
-            var img = document.createElement("img");
-            imgs[src] = {img: img, onload: [], loaded: false};
-            var func = function(src) {
-                var imgs = tetresse.modules.graphics.sources.imgs;
-                imgs[src].loaded = true;
-                imgs[src].onload.forEach(function(ele) {
-                    ele.f(ele.a, imgs[src].img);
-                });
-                imgs[src].onload = [];
-            }
-            img.onload = func.bind(this, src);
-            img.src = src;
-        }
-        if (callback != null && !imgs[src].loaded) {
-            imgs[src].onload.push({f: callback, a: args});
-            return true;
-        }
-        return false;
-            // callback(args, imgs[src].img);
-    },
-    draw(game, canvas, loc = {x: 0, y: 0, w: 100, h: 100, t: 1, r: 0}, source = {}, animate = true) {
-        [{x: 0}, {y: 0}, {w: 100}, {h: 100}, {t: 1}, {r: 0}].forEach(function(ele) {
-            for (var v in ele) loc[v] = loc[v] == null ? loc[v] = ele[v] : loc[v];
-        });
-        if (canvas == null) { tetresse.utils.error("canvas cannot be null"); return; }
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        if (source.color != null) {
-            if (source.color == "clear") {
-                ctx.clearRect(loc.x, loc.y, loc.w, loc.h);
-            } else {
-                ctx.rect(loc.x, loc.y, loc.w, loc.h);
-                var color = source.color;
-                if (loc.t != 1) {
-                    color = tetresse.utils.getColor(source.color)
-                    color.t = loc.t;
-                    color = color.getString();
-                }
-                ctx.fillStyle = color;
-                ctx.fill();
-            }
-        }
-        if (source.src != null) { // show image
-            if (tetresse.modules.graphics.sources.imgs[source.src] == null || !tetresse.modules.graphics.sources.imgs[source.src].loaded) {
-                // console.log(tetresse.modules.graphics.sources.imgs[source.src]);
-                // tetresse.utils.error("image (" + source.src + ") missed the train...");
-                tetresse.modules.graphics.loadImage(source.src, function(args, img) {
-                    tetresse.modules.graphics.draw(args.game, args.canvas, args.loc, args.source, args.animate);
-                }, {game: game, canvas: canvas, loc: loc, source: source, animate: animate});
-            } else {
-                var img = tetresse.modules.graphics.sources.imgs[source.src].img;
-                var w = 1; var h = 1;
-                if (img.width / img.height > loc.w / loc.h) w = h * (loc.w / loc.h); // crop width
-                else h = w * (loc.h / loc.w); // crop height
-                ctx.drawImage(img, 0, 0, w * img.height, h * img.height, loc.x, loc.y, loc.w, loc.h);
-            }
-        }
-        if (source.generate != null) { // generate
-            source.generate(game, canvas, source, loc);
-        }
-        if (animate && source.animate != null) { // animate (setup animation, graphics.animate is called every frame
-            var time = (new Date()).getTime();
-            var graphics = game.modules.graphics;
-            graphics.animation.active.push({src: source, loc: loc, time: time});
-            if (graphics.animation.loop == null)
-                graphics.animation.loop = window.requestAnimationFrame(this.components.animate.bind(this, game));
-        }
-    },
-    /**
-     * element: {src, loc, time}
-     *   src: {
-     *   return: true if animation is finished
-     */
-    animate(game, element) { // element is generated and contains src, loc, and time
-        if (game.modules.graphics.settings.disableAnimations) return;
-        if (element.src == null) return;
-        if (element.src.animate == null) return;
-        var animation = game.modules.graphics.animation;
-        var animationFinished = false;
-        var frameSettings = {source: element.src};
-        if (element.src.animate.keyFrames != null) { // animate keyframe
-            var keyFrames = element.src.animate.keyFrames;
-            var time = (new Date()).getTime() - element.time;
-            var nextIndex = tetresse.utils.getLocToInsert(keyFrames, "time", {time: time});
-            var prevKey = keyFrames[nextIndex == 0 ? 0 : nextIndex - 1];
-            var nextKey = keyFrames[nextIndex] === undefined ? keyFrames[nextIndex - 1] : keyFrames[nextIndex];
-            if (keyFrames[nextIndex] === undefined) animationFinished = true;
-            for (var v in prevKey) {
-                if (typeof prevKey[v] == "number" && typeof nextKey[v] == "number")
-                    frameSettings[v] = ((time - prevKey.time) / (nextKey.time - prevKey.time)) * (nextKey[v] - prevKey[v]) + prevKey[v];
-                else
-                    frameSettings[v] = prevKey[v] == null && frameSettings[v] != null ? frameSettings[v] : prevKey[v];
-            }
-        }
-        var loc = {
-            x: element.loc.x + frameSettings.translationX,
-            y: element.loc.y + frameSettings.translationY,
-            w: element.loc.w * frameSettings.scaleX,
-            h: element.loc.h * frameSettings.scaleY,
-            t: frameSettings.transparency,
-        }
-
-        tetresse.modules.graphics.draw(game, game.modules.graphics.canvases.animations, loc, frameSettings.source, false);
-        
-        return animationFinished;
-    },
-    components: {
-        animate(game) { // animates current frame of game animations
-            var graphics = game.modules.graphics;
-            var animation = graphics.animation;
-            var canvas = graphics.canvases.animations;
-            tetresse.modules.graphics.draw(game, canvas, {x: 0, y: 0, w: canvas.width, h: canvas.height}, {color: "clear"}, false);
-            for (var i = 0; i < animation.active.length; i++) {
-                if (tetresse.modules.graphics.animate(game, animation.active[i])) { // check whether completed
-                    animation.active.splice(i, 1);
-                    i--;
-                }
-            }
-            if (animation.active.length == 0) { animation.loop = null; return; }
-            animation.loop = window.requestAnimationFrame(this.components.animate.bind(this, game));
-        },
-        tile(game, loc = {x: 0, y: 0, r: 0, c: 0, w: 2, h: 2}, content = "", hide = {top: 0, bot: 0, left: 0, right: 0}, canvas = null) { // loc in units of n, hide is percent
-            hide = hide == null ? {} : hide;
-            [{arr: ["x", "y", "r", "c"], val: 0, var: loc},
-            {arr: ["w", "h"], val: 2, var: loc},
-            {arr: ["top", "bot", "left", "right"], val: 0, var: hide}].forEach(function(ele) {
-                ele.arr.forEach(function(lbl) {
-                    ele.var[lbl] = ele.var[lbl] == null ? ele.val : ele.var[lbl];
-                });
-            });
-
-            var graphics = game.modules.graphics;
-            if (canvas == null) canvas = graphics.canvases.play;
-            var n = graphics.n;
-            area = {
-                x: (loc.x + loc.c * loc.w + hide.left * loc.w) * n,
-                y: (loc.y + loc.r * loc.h + hide.top * loc.h) * n,
-                w: (loc.w - (hide.left + hide.right) * loc.w) * n,
-                h: (loc.h - (hide.top + hide.bot) * loc.h) * n
-            };
-            for (var e in area)
-                area[e] = Math.floor(area[e]);
-            tetresse.modules.graphics.draw(game, canvas, area, tetresse.modules.graphics.getSource(game, "tiles")[content]);
-            tetresse.modules.graphics.draw(game, canvas, area, tetresse.modules.graphics.getSource(game, "tiles").all);
-        },
-        piece(game, loc = {x: 0, y: 0, s: 2}, piece, arr) { // piece must be a valid piece
-            if (piece == null) { tetresse.utils.error("piece cannot be null"); return; }
-            arr = arr == null ? tetresse.utils.pieces.layouts[piece] : arr;
-            if (arr == null) { tetresse.utils.error("invalid piece: " + piece); return; };
-            for (var r = 0; r < arr.length; r++)
-                for (var c = 0; c < arr.length; c++)
-                    if (arr[r][c] == 1) {
-                        this.tile(game, {x: loc.x, y: loc.y, r: r, c: c, w: loc.s, h: loc.s}, piece);
-                    }
-        },
-        border(game, loc = {x: 0, y: 0, w: 100, h: 100, t: .5}, canvas = null, content = null) {
-            var graphics = game.modules.graphics;
-            var n = graphics.n;
-            var thickness = (loc.t == null ? .5 : loc.t) * n;
-            loc = {x: loc.x * n, y: loc.y * n, w: loc.w * n, h: loc.h * n};
-            for (var e in loc)
-                loc[e] = Math.floor(loc[e]);
-            canvas = canvas == null ? game.modules.graphics.canvases.play : canvas;
-            tetresse.modules.graphics.draw(game, canvas, loc, tetresse.modules.graphics.getSource(game, "border"));
-            loc = {x: loc.x + thickness, y: loc.y + thickness, w: loc.w - 2 * thickness, h: loc.h - 2 * thickness};
-            for (var e in loc)
-                loc[e] = Math.ceil(loc[e]);
-            tetresse.modules.graphics.draw(game, canvas, loc, tetresse.modules.graphics.getSource(game, "background"));
-            if (content != null)
-                tetresse.modules.graphics.draw(game, canvas, loc, tetresse.modules.graphics.getSource(game, content));
-        },
-        ability(game, tloc = {x: 0, y: 0, w: 100, h: 100}, type, canvas = null, cooldown = 0) { // TODO implement cooldown
-            var loc = {}; [{x: 0}, {y: 0}, {w: 100}, {h: 100}].forEach(function(ele) {
-                for (var v in ele) loc[v] = tloc[v] == null ? ele[v] : tloc[v];
-            });
-            var graphics = game.modules.graphics;
-            var n = graphics.n;
-            var border = n == 1 ? 1 : .5;
-            var source = tetresse.modules.graphics.getSource(game, "abilities");
-            if (source == null) { tetresse.utils.error("source not defined for " + game.mode + ".abilities"); return; }
-            source = source[type];
-            canvas = canvas == null ? graphics.canvases.play : canvas;
-
-            tetresse.modules.graphics.components.border(game, loc, graphics.canvases.play);
-
-            if (source == null) { tetresse.utils.error("[warning] no source for: " + game.mode + ".abilities." + type); return; }
-            if (source.src != null && !tetresse.modules.graphics.sources.imgs[source.src].loaded) {
-                tetresse.modules.graphics.loadImage(source.src, function(args, img) {
-                    tetresse.modules.graphics.components.ability(args.game, args.loc, args.type, args.canvas, args.cooldown);
-                }, {game: game, loc: loc, canvas: canvas, type: type, cooldown: cooldown});
-                return;
-            }
-            loc = {x: loc.x + border, y: loc.y + border, w: loc.w - 2 * border, h: loc.h - 2 * border};
-            for (var v in loc) loc[v] *= n;
-            tetresse.modules.graphics.draw(game, graphics.canvases.play, loc, source);
-        },
-        sideBar(game, loc = {x: 0, y: 0, w: 1, h: 20.5}, source, amount = 0) {
-            var graphics = game.modules.graphics;
-            var n = graphics.n;
-            var border = n == 1 ? 1 : .5;
-            var borderLoc = {x: loc.x - .5, y: loc.y, w: loc.w + 2 * border, h: loc.h};
-            tetresse.modules.graphics.components.border(game, borderLoc);
-            loc.y += loc.h - amount - border;
-            loc.h = amount;
-            loc.x = n == 1 ? Math.ceil(loc.x) : loc.x;
-            for (var v in loc) loc[v] = loc[v] * n;
-            tetresse.modules.graphics.draw(game, graphics.canvases.play, loc, source);
-        }
-    },
-    game: {
-        priority: 30, // TODO use for when choosing which module to load the game first
-        setup(game) {
-            game.modules.graphics = {
-                width: 0, height: 0,
-                n: 0, // n is unit size of hold piece (1/4 size of regular tile)
-                componentWidthN: 0, // width of components in units of n
-                componentHeightN: 0, // height of components in units of n
-                canvases: {},
-                components: {}, // game specific component settings (eg location)
-                sources: {}, // tiles: "retro"
-                grid: tetresse.utils.grid.create(),
-                animation: {
-                    loop: null,
-                    active: [],
-                },
-                settings: {
-                    disableAnimations: false,
-                }
-            };
-
-            // setup canvases
-            [{classes: ["background"]}, {classes: ["play"]}, {classes: ["animations"]}].forEach(function(ele) {
-                var canvas = document.createElement("canvas");
-                ele.classes.forEach(function(label) {
-                    canvas.classList.add(label);
-                });
-                game.div.appendChild(canvas);
-                game.modules.graphics.canvases[ele.classes[0]] = canvas;
-            });
-
-
-            var graphics = game.modules.graphics;
-            var components = tetresse.modules.graphics.game.components;
-
-            var componentsList = tetresse.get(game.state.spectating ? "s.spectatorGraphicsComponents" : "s.graphicsComponents", game);
-
-            componentsList.forEach(function(label) {
-                if (components[label] == null) { tetresse.utils.error("invalid graphics component: " + label); return; }
-                if (components[label].loc == null) return;
-                var arr = components[label].loc.length == null ? [components[label].loc] : components[label].loc;
-                arr.forEach(function(ele) {
-                    tetresse.utils.grid.add(graphics.grid, ele);
-                    graphics.components[ele.label == null ? label : ele.label] = {loc: ele};
-                });
-            });
-            componentsList.forEach(function(label) {
-                if (components[label] == null) { tetresse.utils.error("invalid graphics component: " + label); return; }
-                if (components[label].loc == null) return;
-                var arr = components[label].loc.length == null ? [components[label].loc] : components[label].loc;
-                arr.forEach(function(ele) {
-                    graphics.components[ele.label == null ? label : ele.label].loc = tetresse.utils.grid.get(graphics.grid, ele);
-                });
-            });
-            
-            componentsList.forEach(function(label) { // setup func
-                var comps = tetresse.modules.graphics.game.components;
-                if (comps[label] != null && comps[label].setup != null)
-                    comps[label].setup(game);
-            });
-            
-            // TODO remove later? (replace with a listener)
-            this.resize(game);
-        },
-        cleanup(game) {
-            game.div.parentNode.removeChild(game.div);
-        },
-        resize(game, n) {
-            var graphics = game.modules.graphics;
-            var gridDimensions = tetresse.utils.grid.getTotals(graphics.grid);
-
-            if (n == null) {
-                // update canvas widths
-                game.div.style.width = "100%";
-                game.div.style.height = "100%";
-                if (typeof window.getComputedStyle !== "undefined") {
-                    graphics.width = parseInt(window.getComputedStyle(game.div, null).getPropertyValue('width'));
-                    graphics.height = parseInt(window.getComputedStyle(game.div, null).getPropertyValue('height'));
+            if (typeof(src.src) === "function") utils.draw(game, canvas, data, src.src);
+            var ctx = canvas.getContext("2d");
+            ctx.beginPath();
+            if (data.type === "rect" && data.color !== undefined) {
+                if (data.color === "clear") {
+                    ctx.clearRect(data.x * data.n, data.y * data.n, data.w * data.n, data.h * data.n);
                 } else {
-                    tetresse.utils.error("[warning] browser does not support window.getComputedStyle");
-                    graphics.width = game.div.clientWidth;
-                    graphics.height = game.div.clientHeight;
+                    ctx.rect(data.x * data.n, data.y * data.n, data.w * data.n, data.h * data.n);
+                    ctx.fillStyle = data.color;
+                    ctx.fill();
                 }
-
-                for (var canvas in graphics.canvases) {
-                    graphics.canvases[canvas].width = graphics.width;
-                    graphics.canvases[canvas].height = graphics.height;
-                }
-
-                // update n
-                if (gridDimensions.w / gridDimensions.h > graphics.width / graphics.height) { // width is the deciding factor
-                    graphics.n = Math.floor(graphics.width / gridDimensions.w);
-                    if (graphics.n / 2 != Math.floor(graphics.n / 2) && graphics.n != 1) graphics.n--;
-                } else { // height is deciding factor
-                    graphics.n = Math.floor(graphics.height / gridDimensions.h);
-                    if (graphics.n / 2 != Math.floor(graphics.n / 2) && graphics.n != 1) graphics.n--;
-                }
-                if (graphics.n == 0) graphics.n = 1;
-            } else { graphics.n = n; }
-
-            // shrink canvas and game div to fit board
-            graphics.width = graphics.n * gridDimensions.w;
-            graphics.height = graphics.n * gridDimensions.h;
-            game.div.style.width = graphics.width;
-            game.div.style.height = graphics.height;
-            for (canvas in graphics.canvases) {
-                graphics.canvases[canvas].width = graphics.width;
-                graphics.canvases[canvas].height = graphics.height;
             }
-
-            this.update(game, true);
+            if (src.img !== undefined) {
+                var img;
+                if ((img = sources.imgs[src.img]) !== undefined && img.loaded) {
+                    var w = 1; var h = 1;
+                    if (img.ele.width / img.ele.height > data.w / data.h) w = h * (data.w / data.h); // crop width
+                    else h = w * (data.h / data.w); // crop height
+                    ctx.drawImage(img.ele, 0, 0, w * img.ele.height, h * img.ele.height, data.x, data.y, data.w, data.h);
+                } else { console.warn("[defaultGraphics utils.draw] src.img not loaded: %s", src.img); }
+            }
+            if (src.generate !== undefined) src.generate(canvas, src, data);
+            if (data.animate) {
+                utils.animate(game, canvas, data, src);
+                var animations = game.modules.defaultGraphics.animations;
+                data.animate = false; data.t = window.performance.now() ? window.performance.now() : (new Date()).getTime();
+                animations.active.push({canvas: canvas, src: src, data: data});
+                if (animations.loop === null)
+                    animations.loop = window.requestAnimationFrame((function(time) {
+                        for (var v of this.modules.defaultGraphics.animations.active)
+                            tetresse.modules.defaultGraphics.utils.animate(this, v.canvas, v.data, v.src);
+                    }).bind(this, game));
+            }
+            if (typeof(src.srcAfter) === "function") src.srcAfter(game, canvas, data, src);
         },
-        update(game) {
-            tetresse.get(game.state.spectating ? "s.spectatorGraphicsComponents" : "s.graphicsComponents", game).forEach(function(label) {
-                var comps = tetresse.modules.graphics.game.components;
-                if (comps[label] != null && comps[label].update != null)
-                    comps[label].update(game);
-            });
+        animate(game, canvas, data, src) { // loops through the src to be animated, calls draw every frame
+            console.log("starting animation (not implemented yet)!");
         },
-        components: {
-            board: {
-                loc: {row: {weight: 50, label: "board", n: 42}, col: {weight: 50, label: "board", n: 21}},
-                prev: [], // array of {r: 0, c: 0} of tiles the last piece set that will need to be overwritten
-                update(game) {
-                    var graphics = game.modules.graphics;
-                    tetresse.modules.graphics.components.border(game, graphics.components.board.loc, graphics.canvases.background);
-
-                    var hiddenRows = Math.floor(game.board.length - tetresse.get("s.shownHeight", game));
-                    for (var r = hiddenRows; r < game.board.length; r++) {
-                        for (var c = 0; c < game.board[0].length; c++) {
-                            var content = game.board[r][c];
-                            this.tile(game, r, c, content);
+        pixel: {
+            create(game, settings) {
+                var dg = tetresse.modules.defaultGraphics; var v;
+                ["colors", "layouts", "animations"].forEach(function(label) { if (!settings.m.defaultGraphics[label]) settings.m.defaultGraphics[label] = {}; });
+                var gs = {
+                    width: 0, height: 0, n: 0, componentWidthN: 0, componentHeightN: 0,
+                    canvases: {}, components: {}, animations: { loop: null, active: [] },
+                    grid: dg.utils.grid.create(),
+                    settings: settings.m.defaultGraphics,
+                };
+                for (v in game.modules.defaultGraphics) gs[v] = game.modules.defaultGraphics[v];
+                game.modules.defaultGraphics = gs;
+                ["background", "play", "animation"].forEach(function(label) {
+                    var canvas = document.createElement("canvas");
+                    canvas.id = "tetresse-" + game.id + "-" + label;
+                    canvas.classList.add("tetresse-pixel");
+                    gs.element.appendChild(canvas);
+                    gs.canvases[label] = canvas;
+                });
+                for (v in dg.utils.pixel.p) {
+                    var component = dg.layouts[gs.settings.layouts[v] ? gs.settings.layouts[v] : v];
+                    if (component !== undefined) dg.utils.grid.add(gs.grid, component);
+                }
+                
+                for (v of [
+                    {o: "hold", e: "hold"}, {o: "hold", e: "piece"}, {o: "move", e: "piece"}, {o: "rotate", e: "piece"}, {o: "softdrop", e: "piece"},
+                    {o: "initcur", e: "board"}, {o: "next", e: "piece"}, {o: "next", e: "next"}
+                ])
+                    tetresse.on(game, v.o, 80, dg.utils.pixel.p[v.e]);
+                
+                dg.utils.pixel.resize(game);
+            },
+            destroy(game) {
+                
+            },
+            resize(game, n) {
+                var dg = tetresse.modules.defaultGraphics;
+                var pixel = dg.utils.pixel;
+                var gs = game.modules.defaultGraphics;
+                
+                var gridDimensions = dg.utils.grid.getTotals(gs.grid);
+                if (!n) {
+                    gs.width = gs.element.parentNode.clientWidth;
+                    gs.height = gs.element.parentNode.clientHeight;
+                    if (gs.width === 0 || gs.height === 0) {
+                        if (typeof window.getComputedStyle !== "undefined") {
+                            gs.width = parseInt(window.getComputedStyle(gs.element.parentNode, null).getPropertyValue('width'));
+                            gs.height = parseInt(window.getComputedStyle(gs.element.parentNode, null).getPropertyValue('height'));
+                        } else {
+                            console.warn("[defaultGraphics] browser does not support element.clientWidth or window.getComputedStyle");
+                            // TODO add other method for offset if these two fail
                         }
                     }
-                    this.piece(game);
-                },
-                setup(game) {
-                    game.modules.graphics.components.board.prev = [];
-                    tetresse.on("graphicsBoard", this.update.bind(this), game, "graphicsModuleBoard", 50, game.listeners);
-                    tetresse.on("graphicsPiece", this.piece.bind(this), game, "graphicsModulePiece", 50, game.listeners);
+                    for (var canvas in gs.canvases) {
+                        gs.canvases[canvas].width = gs.width;
+                        gs.canvases[canvas].height = gs.height;
+                    }
+                    if (gridDimensions.w / gridDimensions.h > gs.width / gs.height) { // width is the deciding factor
+                        gs.n = Math.floor(gs.width / gridDimensions.w);
+                        if (gs.n / 2 !== Math.floor(gs.n / 2) && gs.n !== 1) gs.n--;
+                    } else { // height is deciding factor
+                        gs.n = Math.floor(gs.height / gridDimensions.h);
+                        if (gs.n / 2 !== Math.floor(gs.n / 2) && gs.n !== 1) gs.n--;
+                    }
+                    if (gs.n === 0) gs.n = 1;
+                } else { gs.n = n; }
+    
+                // shrink canvas and game div to fit board
+                gs.width = gs.n * gridDimensions.w;
+                gs.height = gs.n * gridDimensions.h;
+                gs.element.style.width = gs.width;
+                gs.element.style.height = gs.height;
+                for (canvas in gs.canvases) {
+                    gs.canvases[canvas].width = gs.width;
+                    gs.canvases[canvas].height = gs.height;
+                }
+                
+                for (var v in pixel.p) {
+                    var newLoc = dg.utils.grid.get(gs.grid, dg.layouts[v]);
+                    if (newLoc === undefined) continue;
+                    if (gs.components[v] === undefined) gs.components[v] = {};
+                    if (newLoc) gs.components[v].layout = newLoc;
+                }
+                
+                tetresse.modules.defaultGraphics.utils.pixel.refresh(game);
+            },
+            refresh(game) {
+                var p = tetresse.modules.defaultGraphics.utils.pixel.p;
+                for (var v in p) p[v](game);
+            },
+            p: {
+                board(game, toUpdate) {
+                    var dg = tetresse.modules.defaultGraphics;
+                    var gs = game.modules.defaultGraphics;
+                    var layout = game.modules.defaultGraphics.components.board.layout;
+                    var drawTile = function(r, c, src) {
+                        if (r < 0 || c < 0 || r < Math.floor(game.board.length - game.settings.shownRows) || c > game.board[0].length) return;
+                        var data = {x: layout.x + c * 2 + .5, y: layout.y + (r - Math.floor(game.board.length - game.settings.shownRows)) * 2 + .5, w: 2, h: 2, n: gs.n};
+                        if (r < game.board.length - game.settings.shownRows) data.h = 1;
+                        else if (Math.floor(game.settings.shownRows) != game.settings.shownRows) data.y -= 1;
+                        dg.utils.draw(game, gs.canvases.play, data, "tile");
+                        dg.utils.draw(game, gs.canvases.play, data, src === "" ? "blank" : src);
+                    };
+                    
+                    if (toUpdate === undefined) {
+                        dg.utils.draw(game, gs.canvases.play, {x: layout.x, y: layout.y, w: layout.w, h: layout.h, n: gs.n}, "border");
+                        for (var r = Math.floor(game.board.length - game.settings.shownRows); r < game.board.length; r++)
+                            for (var c = 0; c < game.board[0].length; c++)
+                                drawTile(r, c, game.board[r][c]);
+                    } else if (toUpdate.length !== undefined)
+                        for (var t of toUpdate)
+                            drawTile(t.r, t.c, t.s === undefined ? game.board[t.r][t.c] : t.s);
                 },
                 piece(game) {
-                    var graphics = game.modules.graphics;
-                    var prev = graphics.components.board.prev;
-                    while (prev.length != 0) {
-                        var ele = prev.pop();
-                        this.tile(game, ele.r, ele.c);
-                    }
-                    var cur = game.cur.layout;
-                    if (cur == null || game.cur.piece == null) return;
-                    if (tetresse.get("s.graphicsGhost", game)) {
-                        var offset = tetresse.get("dropPiece", game)(game, {harddrop: true, pretend: true});
-                        for (var r = 0; r < game.cur.layout.length; r++)
-                            for (var c = 0; c < game.cur.layout[0].length; c++)
-                                if (game.cur.layout[r][c] == 1) {
-                                    prev.push({r: r + offset, c: c + game.cur.loc.x});
-                                    this.tile(game, r + offset, c + game.cur.loc.x, "p");
-                                }
-                    }
+                    if (game.cur.piece === null) return;
+                    var curPiece = []; var v;
+                    var ghostPiece = [];
                     for (var r = 0; r < game.cur.layout.length; r++)
                         for (var c = 0; c < game.cur.layout[0].length; c++)
-                            if (game.cur.layout[r][c] == 1) {
-                                prev.push({r: r + game.cur.loc.y, c: c + game.cur.loc.x});
-                                this.tile(game, r + game.cur.loc.y, c + game.cur.loc.x, game.cur.piece);
-                            }
-                },
-                tile(game, r, c, content = "") { // (0, 0) is top left
-                    var shownHeight = tetresse.get("s.shownHeight", game);
-                    r = r - Math.floor(game.board.length - shownHeight);
-                    if (r < 0 || c < 0 || r > Math.ceil(shownHeight) || c > game.board[0].length) {
-                        tetresse.utils.error("tried to update tile (" + r + ", " + c + "), which is invalid");
-                        return;
+                            if (game.cur.layout[r][c] === 1) curPiece.push({r: r + game.cur.locY, c: c + game.cur.locX});
+                    var toUpdate = [];
+                    var board = game.modules.defaultGraphics.components.board;
+                    board.prevPiece = board.prevPiece === undefined ? [] : board.prevPiece;
+                    if (game.modules.defaultGraphics.settings.ghost !== false) {
+                        var amt = tetresse.utils.game.testDrop(game);
+                        for (v of curPiece) ghostPiece.push({r: v.r + amt, c: v.c});
                     }
-                    var graphics = game.modules.graphics;
-                    var n = graphics.n;
-                    var border = n == 1 ? 1 : .5;
-                    var loc = graphics.components.board.loc;
-                    var area = {
-                        x: loc.x + border,
-                        y: loc.y - 1 + border,
-                        r: r, c: c, w: 2, h: 2
-                    };
-                    tetresse.modules.graphics.components.tile(game, area, content, {top: r == 0 ? .5 : 0});
-                }
-            },
-            hold: {
-                loc: {row: "board", col: {weight: 30, label: "hold", n: 5.5}},
-                widthN: 6, heightN: 6,
-                yN: 5, // offsets from board height
-                update(game) { // TODO move small tile graphic to an external method (include in board.tile?)
-                    var piece = game.cur.hold;
-                    var graphics = game.modules.graphics;
-                    var loc = graphics.components.hold.loc;
-                    var n = graphics.n;
-                    var border = n == 1 ? 1 : .5;
-
-                    var area = {x: loc.x, y: loc.y + this.yN + border, w: this.widthN, h: this.heightN};
-                    tetresse.modules.graphics.components.border(game, area, graphics.canvases.play);
-
-                    if (piece == null) return;
-                    var layout = tetresse.utils.pieces.layouts[piece];
-                    var offset = n == 1 ? 1 : (5 - layout.length) / 2;
-                    var offsetY = piece == "i" ? 1 + offset : (piece == "o") ? 2 : offset * 2;
-                    area = {x: loc.x + border + offset, y: loc.y + this.yN + border + offsetY};
-
-                    tetresse.modules.graphics.components.piece(game, {x: area.x, y: area.y, s: 1}, piece);
-                },
-                setup(game) {
-                    tetresse.on("graphicsHold", this.update.bind(this), game, "graphicsModuleHold", 50, game.listeners);
-                }
-            },
-            next: {
-                loc: {row: "board", col: {weight: 70, label: "next", n: 6}},
-                widthN: 6, heightN: 6,
-                yN: 5,
-                update(game) {
-                    var pieces = game.cur.next;
-                    var graphics = game.modules.graphics;
-                    var loc = graphics.components.next.loc;
-                    var n = graphics.n;
-                    var border = n == 1 ? 1 : .5;
-                    var numNext = tetresse.get("s.upNext", game);
-                    if (numNext == 0) return;
-
-                    var area = {x: loc.x - (border == 1 ? 0 : border), y: (loc.y + this.yN) + border, w: this.widthN, h: this.heightN};
-                    area.h += 4 * (numNext - 1) + (numNext != 1 ? border : 0);
-
-                    tetresse.modules.graphics.components.border(game, area, graphics.canvases.play);
-
-                    area.h = 6;
-                    tetresse.modules.graphics.components.border(game, area, graphics.canvases.play);
-
-                    for (var i = 0; i < numNext; i++) {
-                        if (pieces == null || pieces.length == 0 || pieces[i] == null) return;
-                        var layout = tetresse.utils.pieces.layouts[pieces[i]];
-                        var offset = (5 - layout.length) / 2;
-                        var offsetY = pieces[i] == "i" ? 1 + offset : (pieces[i] == "o") ? 2 : offset * 2;
-                        var a = {x: area.x + offset + border, y: area.y + offsetY + 4 * i + (i != 0 ? 1 : 0)};
-                        tetresse.modules.graphics.components.piece(game, {x: a.x, y: a.y, s: 1}, pieces[i]);
-                    }
-                },
-                setup(game) {
-                    tetresse.on("graphicsNext", this.update.bind(this), game, "graphicsModuleNext", 50, game.listeners);
-                }
-            },
-            abilities: {
-                loc: {row: "board", col: "hold"},
-                widthN: 5, heightN: 5,
-                yN: 5,
-                update(game) {
-                    var graphics = game.modules.graphics;
-                    var loc = graphics.components.abilities.loc;
-                    var n = graphics.n;
-                    var border = n == 1 ? 1 : .5;
-
-                    var gridDim = tetresse.utils.grid.get(graphics.grid, {row: "board", col: "board"});
-                    var offsetY = (border + tetresse.get("s.shownHeight", game)) * 2 - 10;
-                    var area = {x: (loc.x + 1), y: (loc.y + offsetY) + border, w: this.widthN, h: this.heightN};
-                    var passiveArea = {x: loc.x + 1, y: area.y + 6 - border, w: area.w - 2 * border, h: area.h - 2 * border};
                     
-                    var abilities = tetresse.get("s.abilities", game);
-                    if (abilities.length == null) { tetresse.error("the setting 'abilities' length is null in mode: game.mode"); return; }
-                    for (var i = 0; i < abilities.length; i++) {
-                        var ele = abilities[i];
-                        var a = area;
-                        if (ele.type == "passive")
-                            a = passiveArea;
-                        tetresse.modules.graphics.components.ability(game, a, ele.type);
-                        a.y -= 6;
+                    for (v of ghostPiece) board.prevPiece.push({r: v.r, c: v.c, s: "g"});
+                    for (v of curPiece) board.prevPiece.push({r: v.r, c: v.c, s: game.cur.piece});
+                    tetresse.modules.defaultGraphics.utils.pixel.p.board(game, board.prevPiece);
+                    board.prevPiece = curPiece;
+                    for (v of ghostPiece) board.prevPiece.push(v);
+                },
+                hold(game) {
+                    var dg = tetresse.modules.defaultGraphics;
+                    var gs = game.modules.defaultGraphics;
+                    var layout = game.modules.defaultGraphics.components.hold.layout;
+                    dg.utils.draw(game, gs.canvases.play, {x: layout.x, y: layout.y + 5, w: layout.w + .5, h: layout.w + .5, n: gs.n}, "border");
+                    dg.utils.pixel.p.next(game, [{x: layout.x + .5, y: layout.y + 5.5, p: game.cur.hold}]);
+                },
+                next(game, toUpdate) {
+                    var dg = tetresse.modules.defaultGraphics;
+                    var gs = game.modules.defaultGraphics;
+                    var layout = game.modules.defaultGraphics.components.next.layout;
+                    
+                    var drawSmallPiece = function(x, y, p, w, h) {
+                        var data = {x: x, y: y, w: w === undefined ? 5 : w, h: h === undefined ? 5 : h, n: gs.n};
+                        dg.utils.draw(game, gs.canvases.play, data, "background");
+                        if (p === null || p === undefined) return;
+                        var pLayout = tetresse.utils.pieces.layouts[p];
+                        if (pLayout === undefined) return;
+                        x += (data.w - 4) / 2 + (4 - pLayout.length) / 2;
+                        y += (data.h - 4) / 2 + .5 + (4 - pLayout.length) / 2 + (p === "o" ? -.5 : 0);
+                        for (var r = 0; r < pLayout.length; r++)
+                            for (var c = 0; c < pLayout[0].length; c++)
+                                if (pLayout[r][c] === 1) {
+                                    dg.utils.draw(game, gs.canvases.play, {x: x + c, y: y + r, w: 1, h: 1, n: gs.n}, p);
+                                }
                     }
-                }
-            },
-            shake: { // TODO
-                loc: [
-                    {row: {weight: 5, label: "northShake", n: 1}, col: "board", label: "northShake"},
-                    {row: "board", col: {weight: 5, label: "eastShake", n: 1}, label: "eastShake"},
-                    {row: {weight: 95, label: "southShake", n: 1}, col: "board", label: "southShake"},
-                    {row: "board", col: {weight: 95, label: "westShake", n: 1}, label: "westShake"},
-                ],
-                update(game, force = 50, direction = "east", rebound = false) { // force is on a scale from 0 to 100
-
-                }
-            },
-            background: {
-                loc: {row: "board", col: "board"},
-                update(game) {
-                    var graphics = game.modules.graphics;
-                    var ctx = graphics.canvases.background.getContext("2d");
-
-                    var n = graphics.n;
-                    var border = n == 1 ? 1 : n / 2;
-                    var loc = graphics.components.background.loc;
-                    var widthN = 21;
-                    var heightN = 42;
-                    var area = {x: loc.x * n + border, y: loc.y * n + border, w: widthN * n - 2 * border, h: heightN * n - 2 * border};
-                    var source = tetresse.modules.graphics.getSource(game, "background");
-                    tetresse.modules.graphics.draw(game, graphics.canvases.background, area, source);
+                    if (toUpdate === undefined) {
+                        var height = game.cur.nextBufferSize * (4) + 2.5;
+                        tetresse.modules.defaultGraphics.utils.draw(game, gs.canvases.play, {x: layout.x - .5, y: layout.y + 5, w: layout.w, h: height, n: gs.n}, "border");
+                        drawSmallPiece(layout.x, layout.y + 5.5, game.cur.next[0]);
+                        for (var i = 0; i < game.cur.nextBufferSize - 1; i++)
+                            drawSmallPiece(layout.x, layout.y + 5 + layout.w + i * 4, game.cur.next[i + 1], undefined, 4);
+                    } else if (toUpdate.length !== undefined)
+                        for (var v of toUpdate) drawSmallPiece(v.x, v.y, v.p, v.w, v.h);
                 },
-            },
-            lineclear: {
-                play(game, rows) {
-                    var graphics = game.modules.graphics;
-                    var hiddenRows = Math.floor(game.board.length - tetresse.get("s.shownHeight", game));
-                    rows.forEach(function(r) {
-                        for (var c = 0; c < game.board[0].length; c++)
-                            tetresse.modules.graphics.game.components.board.tile(game, r, c, "lineclear");
-                    });
+                incoming(game, toUpdate) {
+                    var dg = tetresse.modules.defaultGraphics;
+                    var gs = game.modules.defaultGraphics;
+                    var layout = game.modules.defaultGraphics.components.incoming.layout;
+                    
+                    var drawBar = function(x, y, h1, h2, s) {
+                        dg.utils.draw(game, gs.canvases.play, {x: x - .5, y: y, w: 1.5, h: h1, n: gs.n}, "border");
+                        dg.utils.draw(game, gs.canvases.play, {x: x, y: y + .5, h: h1 - 1, w: .5, n: gs.n}, "background");
+                        dg.utils.draw(game, gs.canvases.play, {x: x, y: y + h1 - h2 - .5, h: h2, w: .5, n: gs.n}, s);
+                    }
+                    
+                    if (toUpdate === undefined) {
+                        drawBar(layout.x, layout.y, layout.h, 1, "incoming");
+                    } else if (toUpdate.length !== undefined)
+                        for (var v of toUpdate) drawBar(v.x, v.y, v.h1, v.h2, v.s);
                 },
-                setup(game) {
-                    tetresse.on("linesCleared", this.play, game, "animation", 60, game.listeners);
+                mana(game) {
+                    var dg = tetresse.modules.defaultGraphics;
+                    var gs = game.modules.defaultGraphics;
+                    var layout = game.modules.defaultGraphics.components.mana.layout;
+                    dg.utils.pixel.p.incoming(game, [{x: layout.x + .5, y: layout.y, h1: layout.h, h2: 3, s: "mana"}])
                 },
-                cleanup(game) {
-
-                }
-            },
-            incomming: {
-                loc: {row: "board", col: {weight: 60, label: "incomming", n: 1}},
-                setup(game) {
-                    var graphics = game.modules.graphics;
-                    graphics.components.incomming.amount = 6;
+                abilities(game) {
+                    
                 },
-                update(game) {
-                    var graphics = game.modules.graphics;
-                    var loc = graphics.components.incomming.loc;
-                    var n = graphics.n;
-                    var border = n == 1 ? 1 : .5;
-                    var area = {x: loc.x, y: loc.y, w: border, h: loc.h};
-                    tetresse.modules.graphics.components.sideBar(game, area, tetresse.modules.graphics.getSource(game, "incomming"), graphics.components.incomming.amount);
-                }
-            },
-            mana: {
-                loc: {row: "board", col: {weight: 40, label: "mana", n: 1}},
-                setup(game) {
-                    var graphics = game.modules.graphics;
-                    graphics.components.mana.amount = 8;
-                },
-                update(game) {
-                    var graphics = game.modules.graphics;
-                    var loc = graphics.components.mana.loc;
-                    var n = graphics.n;
-                    var border = n == 1 ? 1 : .5;
-                    var area = {x: loc.x + border, y: loc.y, w: border, h: loc.h};
-                    tetresse.modules.graphics.components.sideBar(game, area, tetresse.modules.graphics.getSource(game, "mana"), graphics.components.mana.amount);
-
-                }
             }
-        }
-    },
-}
+        },
+        text: {
+            setup(game, showLetters = false) {
+                var callback = tetresse.modules.defaultGraphics.utils.text[!showLetters ? "generate" : "generateRaw"];
+                tetresse.on(game, "initcur", 80, callback);
+                tetresse.on(game, "CURCHANGE", 80, callback);
+            },
+            generate(game) { tetresse.modules.defaultGraphics.utils.text.gen(game); },
+            generateRaw(game) { tetresse.modules.defaultGraphics.utils.text.gen(game, true); },
+            gen(game, showLetters = false) {
+                var ele = game.modules.defaultGraphics.element;
+                var dashRow = "+--------------------+"; var blankCell = !showLetters ? "&nbsp&nbsp" : "&nbsp";
+                var output = dashRow + "<br>|";
+                var ghostAmt = tetresse.utils.game.testDrop(game);
+                for (var r = game.settings.shownRows - 1; r < game.board.length; r++) {
+                    for (var c = 0; c < game.board[0].length; c++) {
+                        output += '<span style="background-color:';
+                        if (game.cur.layout.length > r - game.cur.locY && r - game.cur.locY >= 0 && game.cur.layout[0].length > c - game.cur.locX && c - game.cur.locX >= 0 && game.cur.layout[r - game.cur.locY][c - game.cur.locX] !== 0) {
+                            output += tetresse.utils.pieces.colors[game.cur.piece] + '">';
+                            output += showLetters ? game.cur.piece : blankCell;
+                        } else if (game.cur.layout.length > r - (game.cur.locY + ghostAmt) && r - (game.cur.locY + ghostAmt) >= 0 && game.cur.layout[0].length > c - game.cur.locX && c - game.cur.locX >= 0 && game.cur.layout[r - game.cur.locY - ghostAmt][c - game.cur.locX] !== 0) {
+                            output += tetresse.utils.pieces.colors.g + '">';
+                            output += showLetters ? "g" : blankCell; // game.cur.piece;
+                            
+                        } else {
+                            output += tetresse.utils.pieces.colors[game.board[r][c] === "" ? "blank" : game.board[r][c]] + '">';
+                            output += showLetters && game.board[r][c] === "" ? game.board[r][c] : blankCell;
+                            //output += game.board[r][c] === "" ? "&nbsp" : game.board[r][c];
+                        }
+                        output += '</span>';
+                    }
+                    output += r + 1 === game.board.length ? "|<br>" : "|<br>|";
+                }
+                output += "+--------------------+";
+                ele.innerHTML = output;
+            }
+        },
+        percent: {
+            setup() {console.warn("[defaultGraphics] percent not implemented yet");}
+        },
+        grid: {
+            create(arr) {
+                var grid = {
+                    rowLabels: {}, // {board: 12}, board ele is in 12th index of rows array
+                    colLabels: {},
+                    rows: [], // {label, weight, n} sorted array of components
+                    cols: [],
+                    rowsChange: false,
+                    colsChange: false,
+                    rowsTotal: 0,
+                    colsTotal: 0,
+                };
+                if (arr) arr.forEach(function(ele) {tetresse.modules.defaultGraphics.utils.grid.add(ele);});
+                tetresse.modules.defaultGraphics.utils.grid.generateLocs(grid);
+                return grid;
+            },
+            /**
+             * ele: {row: {label: "hi", weight: 50, n: 10}, col: "hi"} creates new row / puts in column labeled hi
+             */
+            add(grid, ele) {
+                if (typeof(ele) !== "object") { console.error("[defaultGraphics grid] invalid ele type %s should be object", typeof(ele)); return; }
+                ["row", "col"].forEach(function(rc) {
+                    if (typeof(ele[rc]) === "object") { // trying to add to row / col
+                        if (typeof(ele[rc].label) !== "string") { console.error("[defaultGraphics grid] element.%s.label invalid type %s should be string", rc, typeof(ele[rc].label)); return; }
+                        if (typeof(ele[rc].weight) !== "number") { console.warn("[defaultGraphics grid] (label: %s) element.%s.weight was invalid type %s should be number", ele[rc].label, rc, typeof(ele[rc].weight)); return; }
+                        if (typeof(ele[rc].n) !== "number") { console.warn("[defaultGraphics grid] (label: %s) element.%s.n was invalid type %s should be number", ele[rc].label, rc, typeof(ele[rc].n)); return; }
+                        if (grid[rc + "Labels"][ele[rc].label] !== undefined) { console.error("[defaultGraphics grid] %sLabel %s already exists", rc, ele[rc].label); return; }
+                        var loc = tetresse.utils.misc.getLocToInsert(grid[rc + "s"], "weight", ele[rc]);
+                        grid[rc + "s"].splice(loc, 0, ele[rc]);
+                        grid[rc + "sChange"] = true;
+                    }
+                });
+            },
+            generateLocs(grid) {
+                ["row", "col"].forEach(function(rc) {
+                    if (!grid[rc + "sChange"]) return;
+                    var amount = 0; var i = 0;
+                    grid[rc + "s"].forEach(function(ele) {
+                        grid[rc + "Labels"][ele.label] = i;
+                        ele.nOffset = amount;
+                        amount += ele.n;
+                        i++;
+                    });
+                    grid[rc + "sTotal"] = amount;
+                });
+            },
+            get(grid, ele) { // returns x and y offset as well as w and h
+                if (ele === undefined) return;
+                if (typeof(grid) !== "object" || (typeof(ele) !== "object" && typeof(ele) !== "string")) { console.error("[defaultGraphics grid] Invalid parameters (%s, %s) should be type (object, object/string)", typeof(grid), typeof(ele)); return; }
+                tetresse.modules.defaultGraphics.utils.grid.generateLocs(grid);
+                var row, col;
+                if (typeof(ele) !== "string") {
+                    row = typeof(ele.row) === "string" ? ele.row : ele.row.label;
+                    col = typeof(ele.col) === "string" ? ele.col : ele.col.label;
+                } else {
+                    row = col = ele;
+                }
+                if (grid.colLabels[col] === undefined || grid.rowLabels[row] === undefined) return;
+                col = grid.cols[grid.colLabels[col]];
+                row = grid.rows[grid.rowLabels[row]];
+                return {x: col.nOffset, y: row.nOffset, w: col.n, h: row.n};
+            },
+            getTotals(grid) { // returns {w, h} of totals
+                if (typeof(grid) !== "object") { console.error("[defaultGraphics grid] Invalid grid type %s should be object", typeof(grid)); return; }
+                tetresse.modules.defaultGraphics.utils.grid.generateLocs(grid);
+                return {w: grid.colsTotal, h: grid.rowsTotal};
+            }
+        },
+    }
+};

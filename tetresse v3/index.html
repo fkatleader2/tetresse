@@ -1,10 +1,28 @@
 <head>
     <title>Tetresse v3</title>
     <script src="tetresse v3.js"></script>
-    <script src="modules/defaultGraphics.js"></script>
+    <script src="modules/graphics.js"></script>
     <script src="modules/defaultMaster.js"></script>
-    <script src="modules/defaultControls.js"></script>
+    <script src="modules/controls.js"></script>
+    <script src="modules/gravity.js"></script>
 </head>
 <body onload="tetresse.setup()">
-    <tetresse id="tetresse-game-one">Graphics did not work</tetresse>
+    <div id="header">
+        <div class="center-area">
+            <div class="name">Tetresse</div>
+            <div class="mode">Developer Mode</div>
+            <div class="settings-button">Settings</div>
+        </div>
+    </div>
+    <div id="play">
+        <div class="board">
+            <tetresse id="tetresse-game-one">Graphics did not work</tetresse>
+        </div>
+        <div class="options">
+            <div class="group">
+                <div class="heading">Game Options</div>
+                <div class="button">Enable gravity</div>
+            </div>
+        </div>
+    </div>
 </body>

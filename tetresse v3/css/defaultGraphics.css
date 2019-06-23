@@ -1,13 +1,147 @@
 body {
-    background: #e2f8ff;
+    /* background: #e2f8ff; */
+    background-image: linear-gradient(#2a0353, #8c2500);
+    margin: 0;
+    font-family: sans-serif;
+}
+
+#header {
+    background: green;
+    height: 45px;
+    margin-bottom: 5px;
+    color: white;
+    user-select: none;
+}
+
+#header>.center-area {
+    height: inherit;
+    position: relative;
+}
+
+#header>div>div {
+    position: absolute;
+    text-align: center;
+}
+
+#header>div>.name {
+    font-size: 32px;
+    padding-top: 5px;
+    width: 100%;
+}
+
+#header>div>.mode {
+    left: 15px;
+    color: black;
+    background: #dcdcdc;
+    padding: 5px 3px 0px 3px;
+    border-radius: 0 0 3px 3px;
+    font-size: 15px;
+}
+
+#header>div>.settings-button {
+    right: 10px;
+    top: 10px;
+    color: black;
+    background: #dcdcdc;
+    border-radius: 3px;
+    padding: 5px;
+    font-size: 18px;
+}
+
+#play {
+    height: 600px;
+    position: relative;
+}
+
+#play>.board {
+    position: absolute;
+    background: #00000052;
+    width: 500px;
+    height: inherit;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#play>.options {
+    position: absolute;
+    right: 0;
+    background: #00000052;
+    width: 200px;
+    padding: 10px;
+    border-radius: 10px;
+    color: #dfdfdf;
+    user-select: none;
+}
+
+#play>.options .group>.heading {
+    font-size:14px;
+    border: 0px solid white;
+    border-bottom-width: 1px;
+    padding: 0px;
+    margin-bottom: 2px;
+}
+
+#play>.options .group>.button:hover {
+    cursor: pointer;
+}
+
+#play>.options .group>div {
+    font-size: 12px;
+    padding-left: 8px;
+}
+
+.settings-button {
+    user-select: none;
+}
+
+.settings-button:hover {
+    cursor: pointer;
 }
 
 tetresse {
-    display: inline-block;
-    width: 1000px;
-    height: 1000px;
+    /* display: inline-block; */
+    /* width: inherit; */
+    /* height: inherit; */
 }
 
 canvas.tetresse-pixel {
     position: absolute;
 }
+
+/* regular screen */
+/* @media only screen and (min-width: 600px) and (max-width: 1200px) { */
+@media only screen and (min-width: 600px) {
+    #header {
+        background: none;
+    }
+
+    #header>.center-area, #play {
+        width: 800px;
+        margin: 0 auto;
+        background: none;
+    }
+
+    #header>.center-area {
+        border: 0px solid #5a298a;
+        border-width: 0 3px;
+        border-radius: 0 0 5px 5px;
+    }
+}
+
+/* widescreen */
+@media only screen and (min-width: 20000px) {
+    #header {
+        background: yellow;
+    }   
+}
+
+/* mobile */
+@media only screen and (max-width: 600px) {
+    #header {
+        height: 50px;
+        background: red;
+    }   
+}
+
+
+

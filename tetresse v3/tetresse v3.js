@@ -275,6 +275,7 @@ var tetresse = {
                 tetresse.execute(game, "presoftdrop");
                 game.cur.locY++;
                 tetresse.execute(game, "softdrop");
+                return true;
             },
             hardDrop(game) {
                 var amt = tetresse.utils.game.testDrop(game, Number.MAX_SAFE_INTEGER);
