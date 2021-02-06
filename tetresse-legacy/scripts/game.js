@@ -1593,6 +1593,8 @@ class Game {
             showFinesseErrors: false,
             redoFinesseErrors: true,
             addKeyCode: function(key, number) {
+                var ogNum = Object.keys(this.keyCodes).find(ogNum => this.keyCodes[ogNum] === key);
+                delete this.keyCodes[ogNum];
                 this.keyCodes[number] = key;
                 setCookie("settings", JSON.stringify(this), 1000);
             },
