@@ -1531,6 +1531,7 @@ class Game {
     }
 
     static addKeybind(e) {
+        var ele = e.target.cloneNode(true);
         e.target.style.background = "#cd7f7f";
         e.target.addEventListener("keydown", function(e) {
             e = e || window.event;
@@ -1538,9 +1539,7 @@ class Game {
             
             var board = games[Game.getGameNumber(e.target.id)];
             board.settings.addKeyCode(e.target.parentNode.children[1].innerHTML.toLowerCase(), keyCode);
-            
-            e.target.style.background = "none";
-            var ele = e.target.cloneNode(true);
+
             e.target.parentNode.replaceChild(ele, e.target);
             addEvent(ele, "click", Game.addKeybind);
 
