@@ -379,7 +379,7 @@ class Game {
             v = addChild(keybinds, keybinds.id + "-heading", "div");
             v.classList.add(this.name + "-menu-break");
             v.innerHTML = "Keybinds";
-            arr = ["Left", "Right", "CCW", "CW", "SD", "HD", "Hold", "180"];
+            arr = ["Left", "Right", "CCW", "CW", "SD", "HD", "Hold", "180", "Restart"];
             for (var i = 0; i < arr.length; i++) {
                 var g, e;
                 if (i % 2 == 0) {
@@ -992,6 +992,9 @@ class Game {
                     b.piece.addMove(0);
                     b.updateHeld();
                     b.swapped = true;
+                } else if (b.settings.keyCodes[e.keyCode] == "restart") {
+                    b.resetGame();
+                    b.playPiece();
                 }
             };
 
