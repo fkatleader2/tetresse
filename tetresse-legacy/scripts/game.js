@@ -396,10 +396,41 @@ class Game {
                 v.title = (i == 0 || i == 1 ? "Move " + arr[i].toLowerCase() + "... have you not played tetris before? You should probably learn what the controls do before learning finesse" :
                         (i == 2 || i == 3 ? "Rotate " + (i == 2 ? "counter " : "") + "clockwise" :
                             (i == 4 ? "Soft drop (drop softly)" : (i == 5 ? "Hard drop (http://harddrop.com/fkatleader2/)" :
-                                (i == 6 ? "Hold the current piece in play" : "")
-                            ))
-                        )
+                                (i == 6 ? "Hold the current piece in play" : 
+                                    (i == 7 ? "Flip piece 180" :
+                                        i == 8 ? "Restart the game" : "")
+                                        ))))
                     );
+                v.name = arr[i];
+                v.onclick = function(e) {
+                    settings.style.display = "none";
+
+                    var infoMenu = addChild(menu, menu.id + "-menu", "div");
+                    infoMenu.classList.add("info-menu");
+                    infoMenu.style.display = "block";
+
+                    infoMenu.onclick = function(e) {
+                        infoMenu.style.display = "none";
+                        settings.style.display = "block";
+                    }
+
+                    // key info
+                    var keyInfo = addChild(infoMenu, infoMenu.id + "-title", "div");
+                    keyInfo.classList.add("info-menu-group");
+                    keyInfo.style.display = "block";
+                    v = addChild(keyInfo, keyInfo.id + "-heading", "div");
+                    v.classList.add("info-menu-break");
+                    v.innerHTML = this.name;
+
+                    v = addChild(keyInfo, keyInfo.id + "-text", "div");
+                    v.innerHTML = e.target.title;
+
+                    // close
+                    v = addChild(keyInfo, keyInfo.id, "br")
+                    v = addChild(keyInfo, keyInfo.id + "-text", "div");
+                    v.innerHTML = "< Click to close >";
+                }
+
                 v = addChild(e, e.id + "-text", "div");
                 v.classList.add(this.name + "-menu-keybinds-text");
                 v.innerHTML = arr[i];

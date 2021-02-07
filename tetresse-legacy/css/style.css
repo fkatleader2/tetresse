@@ -552,3 +552,43 @@ div .shadow {
     overflow-y:auto;
     width: 100%;
 }
+
+.info-menu {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    margin: 5%;
+    background-color: lightgrey;
+    font-size: .75vw;
+    white-space: normal;
+}
+
+.info-menu-group {
+    position: relative;
+    overflow: auto;
+    width: 86%;
+    left: 7%;
+}
+
+.info-menu-break {
+    text-align: center;
+    margin: 3% 0% 1% 0%;
+    border: 1px solid black;
+    border-right: 0px;
+    border-left: 0px;
+    position:relative;
+}
+
+.info-title {
+    position: relative;
+    background: #e4e4e4;
+    padding: 1% 0% 1% 0%;
+    text-align: center;
+    width: 100%;
+    overflow: auto;
+    font-size: .884vw;
+}
+
+.info-text {
+    display:inline;
+}
